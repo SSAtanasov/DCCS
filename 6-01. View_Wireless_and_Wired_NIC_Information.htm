@@ -1,0 +1,1145 @@
+<html xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="Generator" content="Microsoft Word 15 (filtered)" />
+	<title>Lab - View Wireless and Wired NIC Information</title>
+	<style>
+		/* Font Definitions */
+		@font-face {
+			font-family: Wingdings;
+			panose-1: 5 0 0 0 0 0 0 0 0 0;
+		}
+
+		@font-face {
+			font-family: SimSun;
+			panose-1: 2 1 6 0 3 1 1 1 1 1;
+		}
+
+		@font-face {
+			font-family: "Cambria Math";
+			panose-1: 2 4 5 3 5 4 6 3 2 4;
+		}
+
+		@font-face {
+			font-family: Calibri;
+			panose-1: 2 15 5 2 2 2 4 3 2 4;
+		}
+
+		@font-face {
+			font-family: Webdings;
+			panose-1: 5 3 1 2 1 5 9 6 7 3;
+		}
+
+		@font-face {
+			font-family: Tahoma;
+			panose-1: 2 11 6 4 3 5 4 4 2 4;
+		}
+
+		@font-face {
+			font-family: "\@SimSun";
+			panose-1: 2 1 6 0 3 1 1 1 1 1;
+		}
+
+		/* Style Definitions */
+		p.MsoNormal,
+		li.MsoNormal,
+		div.MsoNormal {
+			margin-top: 3pt;
+			margin-right: 0in;
+			margin-bottom: 3pt;
+			margin-left: 0in;
+			line-height: 115%;
+			font-size: 11pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		h1 {
+			mso-style-link: "Heading 1 Char";
+			margin-top: 12pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.25in;
+			text-indent: -0.25in;
+			page-break-after: avoid;
+			font-size: 13pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		h2 {
+			mso-style-link: "Heading 2 Char";
+			margin-top: 12pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0in;
+			text-indent: 0in;
+			page-break-after: avoid;
+			font-size: 12pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		h3 {
+			mso-style-link: "Heading 3 Char";
+			margin-top: 12pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0in;
+			text-indent: 0in;
+			page-break-after: avoid;
+			font-size: 11pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		h4 {
+			mso-style-link: "Heading 4 Char";
+			margin-top: 0in;
+			margin-right: 0in;
+			margin-bottom: 0in;
+			margin-left: 0.5in;
+			page-break-after: avoid;
+			font-size: 3pt;
+			font-family: "Arial", sans-serif;
+			color: white;
+			font-weight: normal;
+		}
+
+		p.MsoHeader,
+		li.MsoHeader,
+		div.MsoHeader {
+			mso-style-link: "Header Char";
+			margin-top: 3pt;
+			margin-right: 0in;
+			margin-bottom: 3pt;
+			margin-left: 0in;
+			line-height: 115%;
+			font-size: 11pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		p.MsoFooter,
+		li.MsoFooter,
+		div.MsoFooter {
+			mso-style-link: "Footer Char";
+			margin-top: 3pt;
+			margin-right: 0in;
+			margin-bottom: 0in;
+			margin-left: 0in;
+			font-size: 8pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		p.MsoTitle,
+		li.MsoTitle,
+		div.MsoTitle {
+			mso-style-link: "Title Char";
+			margin-top: 0in;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0in;
+			font-size: 16pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		p.MsoTitleCxSpFirst,
+		li.MsoTitleCxSpFirst,
+		div.MsoTitleCxSpFirst {
+			mso-style-link: "Title Char";
+			margin: 0in;
+			font-size: 16pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		p.MsoTitleCxSpMiddle,
+		li.MsoTitleCxSpMiddle,
+		div.MsoTitleCxSpMiddle {
+			mso-style-link: "Title Char";
+			margin: 0in;
+			font-size: 16pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		p.MsoTitleCxSpLast,
+		li.MsoTitleCxSpLast,
+		div.MsoTitleCxSpLast {
+			mso-style-link: "Title Char";
+			margin-top: 0in;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0in;
+			font-size: 16pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		span.Heading1Char {
+			mso-style-name: "Heading 1 Char";
+			mso-style-link: "Heading 1";
+			font-weight: bold;
+		}
+
+		span.Heading2Char {
+			mso-style-name: "Heading 2 Char";
+			mso-style-link: "Heading 2";
+			font-family: "Times New Roman", serif;
+			font-weight: bold;
+		}
+
+		p.AnswerLineL25,
+		li.AnswerLineL25,
+		div.AnswerLineL25 {
+			mso-style-name: "Answer Line L25";
+			margin-top: 6pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.25in;
+			font-size: 10pt;
+			font-family: "Arial", sans-serif;
+			color: white;
+			font-weight: bold;
+			font-style: italic;
+		}
+
+		p.PageHead,
+		li.PageHead,
+		div.PageHead {
+			mso-style-name: "Page Head";
+			margin-top: 3pt;
+			margin-right: 0in;
+			margin-bottom: 3pt;
+			margin-left: 0in;
+			line-height: 115%;
+			border: none;
+			padding: 0in;
+			font-size: 10pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		p.AnswerLineL50,
+		li.AnswerLineL50,
+		div.AnswerLineL50 {
+			mso-style-name: "Answer Line L50";
+			margin-top: 6pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.5in;
+			font-size: 10pt;
+			font-family: "Arial", sans-serif;
+			color: white;
+			font-weight: bold;
+			font-style: italic;
+		}
+
+		span.HeaderChar {
+			mso-style-name: "Header Char";
+			mso-style-link: Header;
+		}
+
+		span.FooterChar {
+			mso-style-name: "Footer Char";
+			mso-style-link: Footer;
+		}
+
+		p.Bulletlevel1,
+		li.Bulletlevel1,
+		div.Bulletlevel1 {
+			mso-style-name: "Bullet level 1";
+			margin-top: 6pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.5in;
+			text-indent: -0.25in;
+			font-size: 10pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		p.ConfigWindow,
+		li.ConfigWindow,
+		div.ConfigWindow {
+			mso-style-name: "Config Window";
+			margin: 0in;
+			font-size: 3pt;
+			font-family: "Arial", sans-serif;
+			color: white;
+			font-style: italic;
+		}
+
+		p.SubStepAlpha,
+		li.SubStepAlpha,
+		div.SubStepAlpha {
+			mso-style-name: "SubStep Alpha";
+			margin-top: 6pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.5in;
+			text-indent: -0.25in;
+			font-size: 10pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		p.CMD,
+		li.CMD,
+		div.CMD {
+			mso-style-name: CMD;
+			mso-style-link: "CMD Char";
+			margin-top: 3pt;
+			margin-right: 0in;
+			margin-bottom: 3pt;
+			margin-left: 0.5in;
+			font-size: 10pt;
+			font-family: "Courier New";
+		}
+
+		p.BodyTextL50,
+		li.BodyTextL50,
+		div.BodyTextL50 {
+			mso-style-name: "Body Text L50";
+			mso-style-link: "Body Text L50 Char";
+			margin-top: 6pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.5in;
+			font-size: 10pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		p.BodyTextL25,
+		li.BodyTextL25,
+		div.BodyTextL25 {
+			mso-style-name: "Body Text L25";
+			mso-style-link: "Body Text L25 Char";
+			margin-top: 6pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.25in;
+			font-size: 10pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		span.LabTitleInstVersred {
+			mso-style-name: "Lab Title Inst Vers \(red\)";
+			font-family: "Arial", sans-serif;
+			color: #ee0000;
+			font-weight: bold;
+		}
+
+		span.AnswerGray {
+			mso-style-name: "Answer Gray";
+			font-family: "Arial", sans-serif;
+			color: windowtext;
+			border: none;
+			/* background: #d9d9d9; */
+			font-weight: bold;
+		}
+
+		p.SubStepNum,
+		li.SubStepNum,
+		div.SubStepNum {
+			mso-style-name: "SubStep Num";
+			margin-top: 6pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.75in;
+			text-indent: -0.25in;
+			font-size: 10pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		span.DevConfigGray {
+			mso-style-name: "DevConfig Gray";
+			font-family: "Courier New";
+			color: windowtext;
+			border: none;
+			background: #d9d9d9;
+			font-weight: bold;
+		}
+
+		p.BodyTextL25Bold,
+		li.BodyTextL25Bold,
+		div.BodyTextL25Bold {
+			mso-style-name: "Body Text L25 Bold";
+			margin-top: 6pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.25in;
+			font-size: 10pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		p.ReflectionQ,
+		li.ReflectionQ,
+		div.ReflectionQ {
+			mso-style-name: "Reflection Q";
+			margin-top: 6pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.25in;
+			text-indent: -0.25in;
+			page-break-after: avoid;
+			font-size: 10pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		span.Heading4Char {
+			mso-style-name: "Heading 4 Char";
+			mso-style-link: "Heading 4";
+			font-family: "Times New Roman", serif;
+			color: white;
+		}
+
+		span.Heading3Char {
+			mso-style-name: "Heading 3 Char";
+			mso-style-link: "Heading 3";
+			font-family: "Times New Roman", serif;
+			font-weight: bold;
+		}
+
+		span.CMDChar {
+			mso-style-name: "CMD Char";
+			mso-style-link: CMD;
+			font-family: "Courier New";
+		}
+
+		span.TitleChar {
+			mso-style-name: "Title Char";
+			mso-style-link: Title;
+			font-family: SimSun;
+			font-weight: bold;
+		}
+
+		span.BodyTextL25Char {
+			mso-style-name: "Body Text L25 Char";
+			mso-style-link: "Body Text L25";
+		}
+
+		span.BodyTextL50Char {
+			mso-style-name: "Body Text L50 Char";
+			mso-style-link: "Body Text L50";
+		}
+
+		.MsoChpDefault {
+			font-size: 10pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		/* Page Definitions */
+		@page WordSection1 {
+			size: 8.5in 11in;
+			margin: 76.3pt 0.75in 0.9in 0.75in;
+		}
+
+		div.WordSection1 {
+			page: WordSection1;
+		}
+
+		/* List Definitions */
+		ol {
+			margin-bottom: 0in;
+		}
+
+		ul {
+			margin-bottom: 0in;
+		}
+
+		/* Add css for textarea */
+
+		.AnswerGray {
+			padding: 0.2rem;
+		}
+
+		.question-action-container {
+			margin-top: 6pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.5in;
+		}
+
+		.show-answer,
+		.hide-answer {
+			padding: 0.5rem 1rem;
+			background-color: #00bceb;
+			color: #fff;
+			border: 0px;
+			cursor: pointer;
+		}
+
+		.global-action-container {
+			display: flex;
+			margin-top: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.global-action-container .btn__action {
+			margin: 10px;
+		}
+
+		.btn__container button.btn__action:not(.is-full-width) {
+			width: calc(50% - 0.5%);
+		}
+
+		.btn-text {
+			border: 0px;
+			padding: 0.5rem 1rem;
+			background-color: #3d692b;
+			color: #fff;
+			border-radius: 0;
+			cursor: pointer;
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		p.BodyTextL50Answer,
+		li.BodyTextL50Answer,
+		div.BodyTextL50Answer {
+			mso-style-name: "Body Text L50 Answer";
+			mso-style-link: "Body Text L50 Answer Char";
+			margin-top: 6.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: .5in;
+			background: #D9D9D9;
+			font-size: 10.0pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		/* dark theme */
+
+.dark-theme {
+color: #fff;
+}
+
+.dark-theme p.ConfigWindow, .dark-theme li.ConfigWindow, .dark-theme div.ConfigWindow {
+mso-style-name: "Config Window";
+color: #212328;
+}
+
+
+
+.dark-theme h4{
+color: #212328;
+}
+
+.dark-theme .MsoTitle span{
+color: #fff !important;
+}
+
+.dark-theme textarea{
+background-color: #212328;
+color: #fff;
+}
+
+.dark-theme .BodyTextL25Answer{
+background-color: #000;
+color: #fff;
+}
+.dark-theme .BodyTextL25Answer > span{
+padding: 4px;
+}
+
+.dark-theme .BodyTextL25Answer span{
+color: #fff;
+}
+
+.dark-theme .BodyTextL50Answer{
+background-color: #000;
+color: #fff;
+}
+.dark-theme .BodyTextL50Answer > span{
+padding: 4px;
+}
+
+.dark-theme .BodyTextL50Answer span{
+color: #fff;
+}
+
+.dark-theme table tbody tr td{
+color: #fff !important;
+}
+
+.show-all-answers, .hide-all-answers, .clear-all-responces {
+	background-color: #6abf4b;
+	
+}
+
+
+
+	</style>
+
+	<!--[if gte mso 9
+      ]><xml>
+        <mso:CustomDocumentProperties>
+          <mso:xd_Signature msdt:dt="string"></mso:xd_Signature>
+          <mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Editor
+            msdt:dt="string"
+            >Suk-Yi Pennock -X (spennock - UNICON INC at
+            Cisco)</mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Editor
+          >
+          <mso:Order msdt:dt="string">287300.000000000</mso:Order>
+          <mso:xd_ProgID msdt:dt="string"></mso:xd_ProgID>
+          <mso:_ExtendedDescription msdt:dt="string"></mso:_ExtendedDescription>
+          <mso:SharedWithUsers msdt:dt="string"></mso:SharedWithUsers>
+          <mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Author
+            msdt:dt="string"
+            >Suk-Yi Pennock -X (spennock - UNICON INC at
+            Cisco)</mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Author
+          >
+          <mso:ComplianceAssetId msdt:dt="string"></mso:ComplianceAssetId>
+          <mso:TemplateUrl msdt:dt="string"></mso:TemplateUrl>
+          <mso:ContentTypeId msdt:dt="string"
+            >0x01010001F18ECBD8ED834DABF5ACC3DB9AA918</mso:ContentTypeId
+          >
+          <mso:TriggerFlowInfo msdt:dt="string"></mso:TriggerFlowInfo>
+          <mso:_SourceUrl msdt:dt="string"></mso:_SourceUrl>
+          <mso:_SharedFileIndex msdt:dt="string"></mso:_SharedFileIndex>
+          <mso:MediaLengthInSeconds msdt:dt="string"></mso:MediaLengthInSeconds>
+        </mso:CustomDocumentProperties> </xml
+    ><![endif]-->
+</head>
+
+<body lang="EN-US" style="word-wrap: break-word">
+	<div class="WordSection1">
+		<p class="MsoTitle">
+			<span style="color: #ee0000; font-weight: normal"><b><span style="color: windowtext">Lab - View Wireless and
+						Wired NIC Information</span></b></span>
+		</p>
+
+		<h1 style="margin-left: 0in; text-indent: 0in">Objectives</h1>
+
+		<p class="BodyTextL25Bold">Part 1: Identify and Work with PC NICs</p>
+
+		<p class="BodyTextL25Bold">
+			Part 2: Identify and Use the System Tray Network Icons
+		</p>
+
+		<h1 style="margin-left: 0in; text-indent: 0in">Background / Scenario</h1>
+
+		<p class="BodyTextL25">
+			This lab requires you to determine the availability and status of the
+			network interface cards (NICs) on the PC. Windows provides a number of
+			ways to view and work with your NICs.
+		</p>
+
+		<p class="BodyTextL25">
+			In this lab, you will access the NIC information of the PC and change
+			the status of these cards.
+		</p>
+
+		<h1 style="margin-left: 0in; text-indent: 0in">Required Resources</h1>
+
+		<p class="Bulletlevel1" style="
+          margin-top: 3pt;
+          margin-right: 0in;
+          margin-bottom: 3pt;
+          margin-left: 0.5in;
+          line-height: 115%;
+        ">
+			<span style="font-size: 7pt; line-height: 115%; font-family: Webdings">=<span
+					style="font: 7pt 'Times New Roman'">&nbsp;&nbsp; </span></span>1 PC (Windows 10 with two NICs, wired
+			and wireless, and a wireless
+			connection)
+		</p>
+
+		<p class="Bulletlevel1" style="
+          margin-top: 3pt;
+          margin-right: 0in;
+          margin-bottom: 3pt;
+          margin-left: 0.5in;
+          line-height: 115%;
+        ">
+			<span style="font-size: 7pt; line-height: 115%; font-family: Webdings">=<span
+					style="font: 7pt 'Times New Roman'">&nbsp;&nbsp; </span></span>A wireless router
+		</p>
+
+		<h1 style="margin-left: 0in; text-indent: 0in">Instructions</h1>
+
+		<h2 style="margin-left: 0in; text-indent: 0in">
+			Part 1: Identify and Work with PC NICs
+		</h2>
+
+		<p class="BodyTextL25">
+			In Part 1, you will identify the NIC types in the PC. You will explore
+			different ways to extract information about these NICs and how to
+			activate and deactivate them.
+		</p>
+
+		<p class="BodyTextL25">
+			<b>Note</b>: This lab was performed using a PC running on the Windows 10
+			operating system. You should be able to perform the lab with another
+			Windows operating systems version. However, menu selections and screens
+			may vary.
+		</p>
+
+		<h3 style="margin-left: 0in; text-indent: 0in">
+			Step 1: Use Network connections.
+		</h3>
+
+		<p class="BodyTextL25">
+			You will verify which network connections are available.
+		</p>
+
+		<p class="SubStepAlpha">
+			a.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Right-click <b>Start</b> and
+			select <b>Network Connections</b>.
+		</p>
+
+		<p class="SubStepAlpha">
+			b.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>The Network Connections window
+			displays the list of NICs available on
+			this PC. Look for your Local Area Connection and Wireless Network
+			Connection adapters in this window.
+		</p>
+
+		<p class="BodyTextL50">
+			<b>Note</b>: If the Network status page is displayed, click
+			<b>Change adapter options</b> to navigate to the Network Connections
+			window.
+		</p>
+
+		<p class="BodyTextL50">
+			<b>Note</b>: Other types of network adapters, such as Bluetooth Network
+			connection and Virtual Private Network (VPN) adapter, may also be
+			displayed in this window.
+		</p>
+
+		<h3 style="margin-left: 0in; text-indent: 0in">
+			Step 2: Work with your wireless NIC.
+		</h3>
+
+		<p class="BodyTextL25">
+			Verify the wireless network connection settings.
+		</p>
+
+		<p class="SubStepAlpha">
+			a.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Right-click a <b>Wireless
+				Network Connection</b>. The first option
+			displays if your wireless NIC is enabled or disabled. If your wireless
+			NIC is disabled, you will have an option to <b>Enable</b> it.
+		</p>
+
+		<p class="SubStepAlpha">
+			b.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Verify that the wireless network
+			is connected. If not, click
+			<b>Connect/Disconnect </b>to connect to the desired network. Click
+			<b>Status</b> to open the Wireless Network Connection Status window.
+		</p>
+
+		<h4>Questions:</h4>
+
+		<p class="BodyTextL50" style="margin-top: 0in">
+			What is the Service Set Identifier (SSID) for the wireless router of
+			your connection?
+		</p>
+
+		<!-- <p class="AnswerLineL50">Type your answers here.</p> -->
+
+		<div class="question-container">
+			<div class="AnswerLineL50">
+				<fieldset style="width: 50%; font-size: 10px; font-style: normal; color: gray">
+					<legend>Answer Area</legend>
+					<textarea rows="3" name="answerArea" placeholder="Type your answer here."
+						style="border: none; width: 100%"></textarea>
+				</fieldset>
+			</div>
+
+			<p class="BodyTextL50Answer">
+				<span class="AnswerGray"><span style="color: black; border: none"><span style="border: none">Answers
+							will vary. The SSID is the primary name that is
+							associated with wireless local area network (WLAN). These WLANs
+							can be home wireless network or public hotspots. The SSID is
+							used to identify the name of the wireless network.</span></span></span>
+			</p>
+
+			<div class="question-action-container">
+				<button class="MetroBtn show-answer">Show Answer</button>
+				<button class="MetroBtn hide-answer">Hide Answer</button>
+			</div>
+		</div>
+
+		<!-- <p class="BodyTextL50">
+        <span class="AnswerGray"
+          ><span style="color: black; border: none"
+            ><span style="border: none">Answers will vary.</span></span
+          ></span
+        ><span class="AnswerGray"
+          ><span style="color: black; border: none"
+            ><span style="border: none">
+              The SSID is the primary name that is associated with wireless
+              local area network (WLAN). These WLANs can be home wireless
+              network or public hotspots. The SSID is used to identif</span
+            ></span
+          ></span
+        ><span class="AnswerGray"
+          ><span style="color: black; border: none"
+            ><span style="border: none">y</span></span
+          ></span
+        ><span class="AnswerGray"
+          ><span style="color: black; border: none"
+            ><span style="border: none">
+              the name o<span style="border: none"
+                >f the wireless network.</span
+              ></span
+            ></span
+          ></span
+        >
+      </p> -->
+
+		<p class="BodyTextL50">What is the speed of your wireless connection?</p>
+
+		<!-- <p class="AnswerLineL50">Type your answers here.</p> -->
+
+		<div class="question-container">
+			<div class="AnswerLineL50">
+				<fieldset style="width: 50%; font-size: 10px; font-style: normal; color: gray">
+					<legend>Answer Area</legend>
+					<textarea rows="3" name="answerArea" placeholder="Type your answer here."
+						style="border: none; width: 100%"></textarea>
+				</fieldset>
+			</div>
+
+			<p class="BodyTextL50Answer">
+				<span class="AnswerGray"><span style="color: black; border: none"><span style="border: none">Answers
+							will vary. This wireless connection speed indicates the
+							speed between the wireless router and NIC on your PC, not the
+							speed provided by the internet service provider (ISP).</span></span></span>
+			</p>
+
+			<div class="question-action-container">
+				<button class="MetroBtn show-answer">Show Answer</button>
+				<button class="MetroBtn hide-answer">Hide Answer</button>
+			</div>
+		</div>
+
+		<!-- <p class="BodyTextL50">
+        <span class="AnswerGray"
+          ><span style="color: black; border: none"
+            ><span style="border: none">Answers will vary.</span></span
+          ></span
+        ><span class="AnswerGray"
+          ><span style="color: black; border: none"
+            ><span style="border: none">
+              This wireless connection speed
+            </span></span
+          ></span
+        ><span class="AnswerGray"
+          ><span style="color: black; border: none"
+            ><span style="border: none"
+              >indicates the speed between the wireless router and NIC on your
+              PC,
+            </span></span
+          ></span
+        ><span class="AnswerGray"
+          ><span style="color: black; border: none"
+            ><span style="border: none"
+              >not the speed provided by the internet serv<span
+                style="border: none"
+                >ice provider (ISP).</span
+              ></span
+            ></span
+          ></span
+        >
+      </p> -->
+
+		<p class="SubStepAlpha">
+			c.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Click <b>Details</b> to display
+			the Network Connection Details window.
+		</p>
+
+		<h4>Question:</h4>
+
+		<p class="BodyTextL50" style="margin-top: 0in">What is the MAC address of your wireless NIC?</p>
+
+		<!-- <p class="AnswerLineL50">Type your answers here.</p> -->
+		<div class="question-container">
+			<div class="AnswerLineL50">
+				<fieldset style="width: 50%; font-size: 10px; font-style: normal; color: gray">
+					<legend>Answer Area</legend>
+					<textarea rows="3" name="answerArea" placeholder="Type your answer here."
+						style="border: none; width: 100%"></textarea>
+				</fieldset>
+			</div>
+		
+			<p class="BodyTextL50Answer">
+				<span class="AnswerGray"><span style="color: black; border: none"><span style="border: none">
+					Answers will vary. The MAC address is the unique identifier that is assigned to the
+					wireless NIC.</span></span></span>
+			</p>
+		
+			<div class="question-action-container">
+				<button class="MetroBtn show-answer">Show Answer</button>
+				<button class="MetroBtn hide-answer">Hide Answer</button>
+			</div>
+		</div>
+<!-- 
+		<p class="BodyTextL50">
+			<span class="AnswerGray"><span style="color: black; border: none"><span style="border: none">Answers willvary.The MAC address is the unique identifier that is assigned to the
+						wireless NIC.
+		</p> -->
+
+		<p class="SubStepAlpha" style="page-break-after: avoid">
+			d.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Open a Command Prompt and enter
+			<b>ipconfig /all</b>.
+		</p>
+
+		<p class="CMD">C:\Users\Bob&gt; <b>ipconfig /all</b></p>
+
+		<p class="BodyTextL50">
+			Notice the information displayed is similar to the Network Connection
+			Details window information. When you have reviewed the details, click
+			<b>Close</b> to return to the Wireless Network Connection Status window.
+		</p>
+
+		<p class="SubStepAlpha">
+			e.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Return to the Wireless Network
+			Connection Status window. Click
+			<b>Wireless Properties</b> to open the
+			<b>Wireless Network Properties</b> window of the Home-Net network.
+		</p>
+
+		<p class="SubStepAlpha">
+			f.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>You should always use
+			wireless security whenever available. To verify
+			(or configure) the wireless security options click on the
+			<b>Security</b> tab.
+		</p>
+
+		<p class="BodyTextL50">
+			The window displays the type of security and encryption method enabled.
+			You can also enter (or change) the security key in this window. Close
+			all windows.
+		</p>
+
+		<h3 style="margin-left: 0in; text-indent: 0in">
+			Step 3: Work with your wired NIC.
+		</h3>
+
+		<p class="BodyTextL25">
+			We will now verify the wired network connection settings.
+		</p>
+
+		<p class="SubStepAlpha">
+			a.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Open the <b>Network
+				Connections</b> window by right-clicking Windows
+			<b>Start</b> &gt; <b>Network Connections</b>.
+		</p>
+
+		<p class="BodyTextL50">
+			<a name="_Hlk48665205"><b>Note</b>: If the Network status page is displayed, click
+				<b>Change adapter options</b> to navigate to the Network Connections
+				window.</a>
+		</p>
+
+		<p class="SubStepAlpha">
+			b.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Select and right-click the
+			<b>Local Area Connection</b> option to
+			display the drop-down list. If the NIC is disabled, enable it.
+		</p>
+
+		<p class="SubStepAlpha">
+			c.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Click the <b>Status</b> option
+			to open the Local Area Connection Status
+			window. This window displays information about your wired connection to
+			the LAN.
+		</p>
+
+		<p class="SubStepAlpha">
+			d.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Click <b>Details…</b> to view
+			the address information for your LAN
+			connection.
+		</p>
+
+		<p class="SubStepAlpha">
+			e.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Open a Command Prompt and enter
+			<b>ipconfig /all</b>. Find your Local
+			Area Connection information and compare this with the information
+			displayed in the Network Connection Details window.
+		</p>
+
+		<p class="SubStepAlpha">
+			f.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Close all windows on your
+			desktop.
+		</p>
+
+		<h2 style="margin-left: 0in; text-indent: 0in">
+			Part 2: Identify and Use the System Tray Network Icons
+		</h2>
+
+		<p class="BodyTextL25">
+			In Part 2, you will use the network icons in your system tray to display
+			the networks available on the network.
+		</p>
+
+		<p class="SubStepAlpha">
+			a.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>The bottom right-hand corner of
+			the Windows 10 screen contains the
+			system tray. Move your mouse to display the system tray.
+		</p>
+
+		<p class="SubStepAlpha">
+			b.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>If you hover over the network
+			icon in the system tray, it displays the
+			currently connected networks.
+		</p>
+
+		<p class="SubStepAlpha">
+			c.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Click the wireless network icon,
+			and it displays the wired and wireless
+			network SSIDs that are in range of your wireless NIC.
+		</p>
+
+		<p class="SubStepAlpha">
+			d.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Right-click the wireless network
+			icon, and it displays a
+			troubleshooting option and to open the Network and Sharing Center
+			window.
+		</p>
+
+		<p class="SubStepAlpha">
+			e.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp; </span>Click the <b>Open Network and
+				Sharing Center</b> option.
+		</p>
+
+		<p class="SubStepAlpha">
+			f.<span style="font: 7pt 'Times New Roman'">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>The Network and Sharing
+			Center is a central window that displays
+			information about the active network or networks, the network type, the
+			type of access.
+		</p>
+
+		<h1 style="margin-left: 0in; text-indent: 0in">Reflection</h1>
+
+		<p class="BodyTextL25">
+			Why would you activate more than one NIC on a PC?
+		</p>
+
+		<!-- <p class="AnswerLineL25">Type your answers here.</p> -->
+		<div class="question-container">
+			<div class="AnswerLineL50">
+				<fieldset style="width: 50%; font-size: 10px; font-style: normal; color: gray">
+					<legend>Answer Area</legend>
+					<textarea rows="3" name="answerArea" placeholder="Type your answer here."
+						style="border: none; width: 100%"></textarea>
+				</fieldset>
+			</div>
+		
+			<p class="BodyTextL50Answer">
+				<span class="AnswerGray"><span style="color: black; border: none"><span style="border: none">Answers may vary. Multiple NICs can be used if more than one path
+					is needed for the PC. One example of this would be if the PC is
+					being used as a proxy server.</span></span></span>
+			</p>
+		
+			<div class="question-action-container">
+				<button class="MetroBtn show-answer">Show Answer</button>
+				<button class="MetroBtn hide-answer">Hide Answer</button>
+			</div>
+		</div>
+		<!-- <p class="BodyTextL25">
+			<span class="AnswerGray"><span style="color: black; border: none"><span style="border: none">Answers may
+						vary. Multiple NICs can be used if more than one path
+						is needed for the PC. One example of this would be if the PC is
+						being used as a proxy server</span></span></span><span class="AnswerGray"><span
+					style="color: black; border: none"><span style="border: none">.</span></span></span>
+		</p> -->
+
+		<p class="ConfigWindow">End of document</p>
+
+		<div class="global-action-container btn__container">
+			<button class="show-all-answers btn-text btn__action">
+				Show All Answers
+			</button>
+			<button class="hide-all-answers btn-text btn__action hidden">
+				Hide All Answers
+			</button>
+			<button class="clear-all-responces btn-text btn__action">
+				Clear My Responses
+			</button>
+		</div>
+
+		<div id="footerDIV">
+			<span><br />
+				<hr />
+				<span style="
+              padding-right: 5px;
+              float: left;
+              font-family: arial;
+              font-size: 12px;
+            ">© 2017 - 2022 Cisco and/or its affiliates. All rights reserved.
+					Cisco Public</span><br />
+			</span>
+		</div>
+	</div>
+</body>
+<script>
+	window.addEventListener("load", function () {
+		console.log("loaded");
+		document.querySelectorAll(".AnswerGray").forEach(function (ele) {
+			ele.classList.add("hidden");
+		});
+		document.querySelectorAll(".hide-answer").forEach(function (ele) {
+			ele.classList.add("hidden");
+		});
+		document.querySelectorAll(".show-answer").forEach(function (ele) {
+			ele.addEventListener("click", function (e) {
+				e.currentTarget.nextElementSibling.classList.remove("hidden");
+				e.currentTarget
+					.closest(".question-container")
+					.querySelectorAll(".AnswerGray")
+					.forEach(function (ele) {
+						ele.classList.remove("hidden");
+					});
+				ele.classList.add("hidden");
+			});
+		});
+		document.querySelectorAll(".hide-answer").forEach(function (ele) {
+			ele.addEventListener("click", function (e) {
+				e.currentTarget.previousElementSibling.classList.remove("hidden");
+				e.currentTarget
+					.closest(".question-container")
+					.querySelectorAll(".AnswerGray")
+					.forEach(function (ele) {
+						ele.classList.add("hidden");
+					});
+				ele.classList.add("hidden");
+			});
+		});
+		var event = new Event("click", {
+			bubbles: true,
+			cancelable: true,
+		});
+		document.querySelectorAll(".show-all-answers").forEach(function (ele) {
+			ele.addEventListener("click", function (e) {
+				e.currentTarget.nextElementSibling.classList.remove("hidden");
+				ele.classList.add("hidden");
+				document.querySelectorAll(".show-answer").forEach(function (ele) {
+					ele.dispatchEvent(event);
+				});
+			});
+		});
+
+		document.querySelectorAll(".hide-all-answers").forEach(function (ele) {
+			ele.addEventListener("click", function (e) {
+				e.currentTarget.previousElementSibling.classList.remove("hidden");
+				ele.classList.add("hidden");
+				document.querySelectorAll(".hide-answer").forEach(function (ele) {
+					ele.dispatchEvent(event);
+				});
+			});
+		});
+
+		document.querySelectorAll(".clear-all-responces").forEach(function (ele) {
+			ele.addEventListener("click", function (e) {
+				document.querySelectorAll("textArea").forEach(function (ele) {
+					ele.value = "";
+				});
+			});
+		});
+	});
+</script>
+
+</html>

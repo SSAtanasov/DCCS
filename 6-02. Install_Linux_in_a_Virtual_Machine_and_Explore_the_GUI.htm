@@ -1,0 +1,840 @@
+
+<!-- saved from url=(0474)https://predev-ui-components.s3.amazonaws.com/s/ff9e491c-49be-4734-803e-a79e6e83dab1/resources/2c78df52-a789-4b7a-a3c7-d592627acefa/v1/en-US/2.2.3-lab-install-linux-in-a-virtual-machine-and-explore-the-gui.htm?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20230503T064255Z&X-Amz-SignedHeaders=host&X-Amz-Expires=30&X-Amz-Credential=AKIATNGWK2QP4KCDI4VR%2F20230503%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Signature=333ac06614a7540c30169ce59fe6d515098dcfe9dfef3675caf9d10fea4500c0 -->
+<html xmlns:mso="urn:schemas-microsoft-com:office:office" xmlns:msdt="uuid:C2F41010-65B3-11d1-A29F-00AA00C14882"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<meta name="Generator" content="Microsoft Word 15 (filtered)">
+	<title>Lab - Install Linux in a Virtual Machine and Explore the GUI</title>
+	<style>
+		/* Font Definitions */
+		@font-face {
+			font-family: Wingdings;
+			panose-1: 5 0 0 0 0 0 0 0 0 0;
+		}
+
+		@font-face {
+			font-family: SimSun;
+			panose-1: 2 1 6 0 3 1 1 1 1 1;
+		}
+
+		@font-face {
+			font-family: "Cambria Math";
+			panose-1: 2 4 5 3 5 4 6 3 2 4;
+		}
+
+		@font-face {
+			font-family: Calibri;
+			panose-1: 2 15 5 2 2 2 4 3 2 4;
+		}
+
+		@font-face {
+			font-family: Tahoma;
+			panose-1: 2 11 6 4 3 5 4 4 2 4;
+		}
+
+		@font-face {
+			font-family: Webdings;
+			panose-1: 5 3 1 2 1 5 9 6 7 3;
+		}
+
+		@font-face {
+			font-family: "\@SimSun";
+			panose-1: 2 1 6 0 3 1 1 1 1 1;
+		}
+
+		/* Style Definitions */
+		h1 {
+			mso-style-link: "Heading 1 Char";
+			margin-top: 12.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: .25in;
+			text-indent: -.25in;
+			page-break-after: avoid;
+			font-size: 13.0pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		h2 {
+			mso-style-link: "Heading 2 Char";
+			margin-top: 12.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: 0in;
+			text-indent: 0in;
+			page-break-after: avoid;
+			font-size: 12.0pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		h3 {
+			mso-style-link: "Heading 3 Char";
+			margin-top: 12.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: 0in;
+			text-indent: 0in;
+			page-break-after: avoid;
+			font-size: 11.0pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		p.MsoTitle,
+		li.MsoTitle,
+		div.MsoTitle {
+			mso-style-link: "Title Char";
+			margin-top: 0in;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: 0in;
+			font-size: 16.0pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		p.MsoTitleCxSpFirst,
+		li.MsoTitleCxSpFirst,
+		div.MsoTitleCxSpFirst {
+			mso-style-link: "Title Char";
+			margin: 0in;
+			font-size: 16.0pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		p.MsoTitleCxSpMiddle,
+		li.MsoTitleCxSpMiddle,
+		div.MsoTitleCxSpMiddle {
+			mso-style-link: "Title Char";
+			margin: 0in;
+			font-size: 16.0pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		p.MsoTitleCxSpLast,
+		li.MsoTitleCxSpLast,
+		div.MsoTitleCxSpLast {
+			mso-style-link: "Title Char";
+			margin-top: 0in;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: 0in;
+			font-size: 16.0pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		a:link,
+		span.MsoHyperlink {
+			color: blue;
+			text-decoration: underline;
+		}
+
+		span.Heading1Char {
+			mso-style-name: "Heading 1 Char";
+			mso-style-link: "Heading 1";
+			font-weight: bold;
+		}
+
+		span.Heading2Char {
+			mso-style-name: "Heading 2 Char";
+			mso-style-link: "Heading 2";
+			font-family: "Times New Roman", serif;
+			font-weight: bold;
+		}
+
+		p.AnswerLineL25,
+		li.AnswerLineL25,
+		div.AnswerLineL25 {
+			mso-style-name: "Answer Line L25";
+			margin-top: 6.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: .5in;
+			font-size: 10.0pt;
+			font-family: "Arial", sans-serif;
+			color: white;
+			font-weight: bold;
+			font-style: italic;
+		}
+
+		p.Bulletlevel1,
+		li.Bulletlevel1,
+		div.Bulletlevel1 {
+			mso-style-name: "Bullet level 1";
+			margin-top: 6.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: .5in;
+			text-indent: -.25in;
+			font-size: 10.0pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		p.ConfigWindow,
+		li.ConfigWindow,
+		div.ConfigWindow {
+			mso-style-name: "Config Window";
+			margin: 0in;
+			font-size: 3.0pt;
+			font-family: "Arial", sans-serif;
+			color: white;
+			font-style: italic;
+		}
+
+		p.SubStepAlpha,
+		li.SubStepAlpha,
+		div.SubStepAlpha {
+			mso-style-name: "SubStep Alpha";
+			margin-top: 6.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: .5in;
+			text-indent: -.25in;
+			font-size: 10.0pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		p.BodyTextL25Answer,
+		li.BodyTextL25Answer,
+		div.BodyTextL25Answer {
+			mso-style-name: "Body Text L25 Answer";
+			mso-style-link: "Body Text L25 Answer Char";
+			margin-top: 6.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: .5in;
+			background: #D9D9D9;
+			font-size: 10.0pt;
+			line-height: 1.4;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		p.BodyTextL50,
+		li.BodyTextL50,
+		div.BodyTextL50 {
+			mso-style-name: "Body Text L50";
+			mso-style-link: "Body Text L50 Char";
+			margin-top: 6.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: .5in;
+			font-size: 10.0pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		p.BodyTextL25,
+		li.BodyTextL25,
+		div.BodyTextL25 {
+			mso-style-name: "Body Text L25";
+			mso-style-link: "Body Text L25 Char";
+			margin-top: 6.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: .5in;
+			font-size: 10.0pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		p.Visual,
+		li.Visual,
+		div.Visual {
+			mso-style-name: Visual;
+			margin-top: 12.0pt;
+			margin-right: 0in;
+			margin-bottom: 12.0pt;
+			margin-left: 0in;
+			text-align: center;
+			line-height: 115%;
+			font-size: 11.0pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		span.LabTitleInstVersred {
+			mso-style-name: "Lab Title Inst Vers \(red\)";
+			font-family: "Arial", sans-serif;
+			color: #EE0000;
+			font-weight: bold;
+		}
+
+		span.AnswerGray {
+			mso-style-name: "Answer Gray";
+			font-family: "Arial", sans-serif;
+			color: windowtext;
+			border: none;
+			/* background: #D9D9D9; */
+			font-weight: bold;
+		}
+
+		p.SubStepNum,
+		li.SubStepNum,
+		div.SubStepNum {
+			mso-style-name: "SubStep Num";
+			margin-top: 6.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: .75in;
+			text-indent: -.25in;
+			font-size: 10.0pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		p.BodyTextL25Bold,
+		li.BodyTextL25Bold,
+		div.BodyTextL25Bold {
+			mso-style-name: "Body Text L25 Bold";
+			margin-top: 6.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: .25in;
+			font-size: 10.0pt;
+			font-family: "Arial", sans-serif;
+			font-weight: bold;
+		}
+
+		p.ReflectionQ,
+		li.ReflectionQ,
+		div.ReflectionQ {
+			mso-style-name: "Reflection Q";
+			margin-top: 6.0pt;
+			margin-right: 0in;
+			margin-bottom: 6.0pt;
+			margin-left: .25in;
+			text-indent: -.25in;
+			page-break-after: avoid;
+			font-size: 10.0pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		span.Heading3Char {
+			mso-style-name: "Heading 3 Char";
+			mso-style-link: "Heading 3";
+			font-family: "Times New Roman", serif;
+			font-weight: bold;
+		}
+
+		span.TitleChar {
+			mso-style-name: "Title Char";
+			mso-style-link: Title;
+			font-family: SimSun;
+			font-weight: bold;
+		}
+
+		span.BodyTextL25Char {
+			mso-style-name: "Body Text L25 Char";
+			mso-style-link: "Body Text L25";
+		}
+
+		span.BodyTextL50Char {
+			mso-style-name: "Body Text L50 Char";
+			mso-style-link: "Body Text L50";
+		}
+
+		.MsoChpDefault {
+			font-size: 10.0pt;
+			font-family: "Arial", sans-serif;
+		}
+
+		/* Page Definitions */
+		@page WordSection1 {
+			size: 8.5in 11.0in;
+			margin: 76.3pt .75in .9in .75in;
+		}
+
+		div.WordSection1 {
+			page: WordSection1;
+		}
+
+		/* List Definitions */
+		ol {
+			margin-bottom: 0in;
+		}
+
+		ul {
+			margin-bottom: 0in;
+		}
+
+		/* Add css for textarea */
+
+		.AnswerGray {
+			padding: 0.2rem;
+		}
+
+		.question-action-container {
+			margin-top: 6pt;
+			margin-right: 0in;
+			margin-bottom: 6pt;
+			margin-left: 0.5in;
+		}
+
+		.show-answer,
+		.hide-answer {
+			padding: 0.5rem 1rem;
+			background-color: #00bceb;
+			color: #fff;
+			border: none;
+			margin-top: 1rem;
+			cursor: pointer;
+		}
+
+		.global-action-container {
+			display: flex;
+			margin-top: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.global-action-container .btn__action {
+			margin: 10px;
+		}
+
+		.btn__container button.btn__action:not(.is-full-width) {
+			width: calc(50% - .5%);
+		}
+
+		.btn-text {
+			border: 0px;
+			padding: 0.5rem 1rem;
+			background-color: #6abf4b;
+			color: #fff;
+			margin-top: 1rem;
+			border-radius: 0;
+			cursor: pointer
+		}
+
+		.hidden {
+			display: none;
+		}
+
+		.dark-theme {
+			color: #fff;
+		}
+
+		.dark-theme .dark-color {
+			color: #fff !important;
+		}
+
+		.dark-theme p.ConfigWindow,
+		.dark-theme li.ConfigWindow,
+		.dark-theme div.ConfigWindow {
+			mso-style-name: "Config Window";
+			color: #212328;
+		}
+
+		.dark-theme h4 {
+			color: #212328;
+		}
+
+		.dark-theme .MsoTitle span {
+			color: #fff !important;
+		}
+
+		.dark-theme textarea {
+			background-color: #212328;
+			color: #fff;
+		}
+
+		.dark-theme .BodyTextL25Answer {
+			background-color: #000;
+			color: #fff;
+		}
+
+		.dark-theme .BodyTextL25Answer>span {
+			padding: 4px;
+		}
+
+		.dark-theme .BodyTextL25Answer span {
+			color: #fff;
+		}
+
+		.dark-theme table tbody tr td {
+			color: #fff !important;
+		}
+
+		.dark-theme table .TableHeading {
+			color: #000;
+		}
+	</style>
+
+
+	<!--[if gte mso 9]><xml>
+<mso:CustomDocumentProperties>
+<mso:xd_Signature msdt:dt="string"></mso:xd_Signature>
+<mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Editor msdt:dt="string">Suk-Yi Pennock -X (spennock - UNICON INC at Cisco)</mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Editor>
+<mso:Order msdt:dt="string">285300.000000000</mso:Order>
+<mso:xd_ProgID msdt:dt="string"></mso:xd_ProgID>
+<mso:_ExtendedDescription msdt:dt="string"></mso:_ExtendedDescription>
+<mso:SharedWithUsers msdt:dt="string"></mso:SharedWithUsers>
+<mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Author msdt:dt="string">Suk-Yi Pennock -X (spennock - UNICON INC at Cisco)</mso:display_urn_x003a_schemas-microsoft-com_x003a_office_x003a_office_x0023_Author>
+<mso:ComplianceAssetId msdt:dt="string"></mso:ComplianceAssetId>
+<mso:TemplateUrl msdt:dt="string"></mso:TemplateUrl>
+<mso:ContentTypeId msdt:dt="string">0x01010001F18ECBD8ED834DABF5ACC3DB9AA918</mso:ContentTypeId>
+<mso:TriggerFlowInfo msdt:dt="string"></mso:TriggerFlowInfo>
+<mso:_SourceUrl msdt:dt="string"></mso:_SourceUrl>
+<mso:_SharedFileIndex msdt:dt="string"></mso:_SharedFileIndex>
+<mso:MediaLengthInSeconds msdt:dt="string"></mso:MediaLengthInSeconds>
+</mso:CustomDocumentProperties>
+</xml><![endif]-->
+</head>
+
+<body lang="EN-US" link="blue" vlink="purple" style="word-wrap:break-word">
+
+	<div class="WordSection1">
+
+		<p class="MsoTitle"><span style="color:#EE0000;font-weight:normal"><b><span style="color:windowtext">Lab - Install
+						Linux in a Virtual Machine and Explore
+						the GUI</span></b></span></p>
+
+		<h1 style="margin-left:0in;text-indent:0in"><a name="_Hlk52540134">Objectives</a></h1>
+
+		<p class="BodyTextL25Bold">Part 1: Prepare a Computer for Virtualization</p>
+
+		<p class="BodyTextL25Bold">Part 2: Install a Linux OS on the Virtual Machine</p>
+
+		<p class="BodyTextL25Bold">Part 3: Explore the GUI</p>
+
+		<h1 style="margin-left:0in;text-indent:0in;line-height:115%">Background /
+			Scenario</h1>
+
+		<p class="BodyTextL25"><a name="_Toc492961008"></a><a name="_Toc492974528"></a><a name="_Toc492974581"></a><a name="_Toc494171525">Computing power and resources
+				have increased tremendously over the last 10 years. A benefit of multi-core
+				processors and large amounts of RAM is the ability to install multiple
+				operating systems through the use of virtualization on a computer. </a></p>
+
+		<p class="BodyTextL25">With virtualization, one or more virtual computers can
+			operate inside one physical computer. Virtual computers that run within
+			physical computers are called virtual machines. Virtual machines are often
+			called guests, and physical computers are often called hosts. Anyone with a
+			modern computer and operating system can run virtual machines.</p>
+
+		<p class="BodyTextL25">In this lab, you will install a Linux OS in a virtual
+			machine using a desktop virtualization application, such as VirtualBox. After
+			completing the installation, you will explore the GUI interface. You will also
+			explore the command line interface using this virtual machine in a lab later in
+			this course.</p>
+
+		<h1 style="margin-left:0in;text-indent:0in;line-height:115%">Required Resources</h1>
+
+		<p class="Bulletlevel1" style="margin-top:3.0pt;margin-right:0in;margin-bottom:
+3.0pt;margin-left:.5in;line-height:115%"><span style="font-size:7.0pt;
+line-height:115%;font-family:Webdings">=<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;
+				</span></span>Computer with a minimum of 2 GB of RAM and 10 GB of free disk
+			space</p>
+
+		<p class="Bulletlevel1" style="margin-top:3.0pt;margin-right:0in;margin-bottom:
+3.0pt;margin-left:.5in;line-height:115%"><span style="font-size:7.0pt;
+line-height:115%;font-family:Webdings">=<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;
+				</span></span>High-speed Internet access to download Oracle VirtualBox and
+			Linux OS image, such as Ubuntu Desktop</p>
+
+		<h1>Instructions</h1>
+
+		<h2 style="margin-left:0in;text-indent:0in">Part 1: Prepare a Computer for
+			Virtualization</h2>
+
+		<p class="BodyTextL25">In Part 1, you will download and install desktop
+			virtualization software and a Linux OS image. Your instructor may provide you
+			with a Linux OS image.</p>
+
+		<h3 style="margin-left:0in;text-indent:0in">Step 1: Download and install
+			VirtualBox.</h3>
+
+		<p class="BodyTextL25">VMware Player and Oracle VirtualBox are two virtualization
+			programs that you can download and install to support the OS image file. In
+			this lab, you will use the VirtualBox application. </p>
+
+		<p class="SubStepAlpha">a.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Navigate to <a href="https://www.virtualbox.org/" target="blank">https://www.virtualbox.org/</a>.
+			Click the download link on this page.</p>
+
+		<p class="SubStepAlpha">b.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Choose and download the appropriate installation file based on your
+			operating system.</p>
+
+		<p class="SubStepAlpha">c.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>After the VirtualBox installation file is downloaded, run the installer
+			and accept the default installation settings.</p>
+
+		<h3 style="margin-left:0in;text-indent:0in">Step 2: Download a Linux Image.</h3>
+
+		<p class="SubStepAlpha">a.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Navigate to the Ubuntu website at <a href="http://www.ubuntu.com/" target="blank">http://www.ubuntu.com</a>.
+			Click the Download link on this page to download and save an Ubuntu Desktop
+			image.</p>
+
+		<h3 style="margin-left:0in;text-indent:0in">Step 3: Create a New Virtual
+			Machine.</h3>
+
+		<p class="SubStepAlpha">a.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Click <b>Start</b> and search for <b>Virtualbox</b>. Click <b>Oracle VM
+				VirtualBox</b> to open the manager. When the manager opens, click <b>New</b> to
+			start the Ubuntu installation.</p>
+
+		<p class="SubStepAlpha">b.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>In the <b>Name and operating system</b> screen, type <b>Ubuntu</b> in
+			the <b>Name</b> field. For the <b>Type</b> field, select <b>Linux</b>. In the <b>Version</b>
+			field, select the corresponding downloaded version. Click <b>Next</b> to
+			continue.</p>
+
+		<p class="SubStepAlpha">c.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>In the <b>Memory size</b> screen, increase the amount of RAM as long as
+			the amount of RAM for the virtual machine is in the green area. Going beyond
+			the green area would adversely affect the performance of the host. Click <b>Next</b>
+			to continue.</p>
+
+		<p class="SubStepAlpha">d.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>In the <b>Hard disk</b> screen, click <b>Create</b> to create a virtual
+			hard disk now.</p>
+
+		<p class="SubStepAlpha">e.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>In the <b>Hard disk file type</b> screen, use the default file type
+			settings of <b>VDI (VirtualBox Disk Image)</b>. Click <b>Next</b> to continue.</p>
+
+		<p class="SubStepAlpha">f.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>In the <b>Storage on physical hard disk</b> screen, use the default
+			storage settings of <b>dynamically allocated</b>. Click <b>Next</b> to
+			continue.</p>
+
+		<p class="SubStepAlpha">g.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>In the <b>File location and size</b> screen, you can adjust the hard
+			drive and change the name and location of the virtual hard drive. Click <b>Create</b>
+			to use the default settings.</p>
+
+		<p class="SubStepAlpha">h.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>When the hard drive creation is done, the new virtual machine is listed
+			in the <b>Oracle VM VirtualBox Manager </b>window. Select <b>Ubuntu</b> and
+			click <b>Start</b> in the top menu.</p>
+
+		<h2 style="margin-left:0in;text-indent:0in">Part 2: Install Ubuntu on the
+			virtual machine</h2>
+
+		<h3 style="margin-left:0in;text-indent:0in">Step 1: Mount the Image.</h3>
+
+		<p class="SubStepAlpha">a.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>In the <b>Oracle VM Virtualbox Manager</b> window. Right-click <b>Ubuntu</b>
+			and select <b>Settings</b>. In the <b>Ubuntu – Settings</b> window, click <b>Storage</b>
+			in the left pane. Click <b>Empty</b> in the middle pane. In the right pane,
+			click the CD symbol and select the file location of the Ubuntu image. Click <b>OK</b>
+			to continue.</p>
+
+		<p class="SubStepAlpha" style="page-break-after:avoid">b.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>In the <b>Oracle VM VirtualBox Manager </b>window, click <b>Start</b> in
+			the top menu.</p>
+
+		<p class="Visual"><img border="0" width="384" height="250" id="Picture 52" src="data:image/jpeg;base64,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" alt="This image depicts the storage settings where you could choose the location of optical disk or optical disk file for installing OS.">
+		</p>
+
+		<h3 style="margin-left:0in;text-indent:0in">Step 2: Install the OS.</h3>
+
+		<p class="SubStepAlpha">a.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>In the <b>Welcome</b> screen, you are prompted to try or install Ubuntu.
+			The try option does not install the OS, it runs the OS straight from the image.
+			In this lab, you will install the Ubuntu OS in this virtual machine. Click <b>Install
+				Ubuntu</b>.</p>
+
+		<p class="SubStepAlpha">b.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Follow the on-screen instructions and provide the necessary information
+			when prompted.</p>
+
+		<p class="BodyTextL50"><b>Note</b>: If you are not connected to the Internet, you
+			can continue to install and enable the network later.</p>
+
+		<p class="SubStepAlpha">c.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Because this Ubuntu installation is in a virtual machine, it is safe to
+			erase the disk and install Ubuntu without affecting the host computer. Select <b>Erase
+				disk and install Ubuntu</b>. Otherwise installing Ubuntu on a physical computer
+			would erase all data on the disk and replace the existing operating system with
+			Ubuntu. Click <b>Install Now</b> to start the installation.</p>
+
+		<p class="SubStepAlpha">d.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Click <b>Continue </b>to erase the disk and install Ubuntu.</p>
+
+		<p class="SubStepAlpha">e.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>In the <b>Who are you? </b>screen, provide your name and choose a
+			password. You can use the username generated or enter a different username.
+			Enter your desired username and password. If desired, you can change the other
+			settings. Click <b>Continue</b>.</p>
+
+		<p class="SubStepAlpha">f.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>The Ubuntu OS is now installing in the virtual machine. This will take
+			several minutes. When the <b>Installation is complete</b> message displays,
+			return to the <b>Oracle VM Virtualbox Manager</b> window. Right-click <b>Ubuntu</b>
+			and select <b>Settings</b>. In the <b>Ubuntu – Settings</b> window, click <b>Storage</b>
+			in the left pane. Click the mounted Ubuntu image in the middle pane. In the
+			right pane, click the CD symbol and click <b>Remove Disk from Virtual Drive</b>.
+			Click <b>OK</b> to continue.</p>
+
+		<p class="SubStepAlpha">g.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>In the Ubuntu VM, click <b>Restart Now</b>.</p>
+
+		<h2 style="margin-left:0in;text-indent:0in">Part 3: Explore the GUI</h2>
+
+		<p class="BodyTextL25">In this part, you will install the VirtualBox guest
+			additions and explore the Ubuntu GUI.</p>
+
+		<h3 style="margin-left:0in;text-indent:0in">Step 1: Install Guest Additions.</h3>
+
+		<p class="SubStepAlpha">a.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Log on to your Ubuntu virtual machine using the user credentials created
+			in the previous part.</p>
+
+		<p class="SubStepAlpha" style="page-break-after:avoid">b.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Your Ubuntu Desktop window may be smaller than expected. This is
+			especially true on high-resolution displays. Click <b>Device &gt; Insert Guest
+				Additions CD image…</b> to install the Guest Additions. This allows more
+			functions, such as changing the screen resolution in the virtual machine.</p>
+
+		<p class="Visual"><img border="0" width="365" height="312" id="Picture 105" src="data:image/jpeg;base64,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" alt="This image displays the location of the menu option to insert Guest additions CD image."></p>
+
+		<p class="SubStepAlpha">c.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Click <b>Run</b> to install the additions. When prompted for a password,
+			use the same password that you used to log on. Click <b>Authenticate</b> to
+			continue.</p>
+
+		<p class="SubStepAlpha">d.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>If the computer was not connected to the Internet during the
+			installation, click <b>Devices &gt; Network Settings</b> in the Oracle
+			VirtualBox menu. Enable network adapters and configure the proper setting for
+			network connections as necessary. Click <b>OK</b>.</p>
+
+		<p class="SubStepAlpha">e.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>When the installation of the additions is done, restart the virtual
+			machine again. Click the menu in the upper-right corner and click <b>Shut down</b>.
+			Click <b>Restart</b> to restart Ubuntu.</p>
+
+		<h3 style="margin-left:0in;text-indent:0in">Step 2: Open a web browser.</h3>
+
+		<p class="SubStepAlpha">a.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Log on to Ubuntu again. After you are logged on again, you can resize
+			the virtual machine window.</p>
+
+		<p class="SubStepAlpha">b.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Open a web browser. Depending on the Linux distribution, you may need to
+			search for a web browser or there is a link to a web browser already on the
+			Desktop.</p>
+
+		<p class="SubStepAlpha">c.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Locate a terminal emulator to access the command line interface. You
+			will be using a terminal emulator in later labs.</p>
+
+		<p class="SubStepAlpha">d.<span style="font:7.0pt &quot;Times New Roman&quot;">&nbsp;&nbsp;&nbsp;&nbsp;
+			</span>Explore the installed Linux distribution and locate a few applications
+			that you may use.</p>
+
+		<h1 style="margin-left:0in;text-indent:0in;line-height:115%">Reflection Question</h1>
+
+		<p class="BodyTextL25" style="page-break-after:avoid">What are the advantages and
+			disadvantages of using a virtual machine?</p>
+
+		<!-- <p class=AnswerLineL25>Type your answers here.</p> -->
+		<div class="question-container">
+			<div class="AnswerLineL25">
+				<fieldset style="width:50%;font-size:10px;font-style:normal;color:gray;">
+					<legend>Answer Area</legend><textarea rows="3" name="answerArea" placeholder="Type your answer here." style="border:none;width:100%;"></textarea>
+				</fieldset>
+			</div>
+
+			<p class="BodyTextL25Answer"><span class="AnswerGray hidden"><span style="color:black;
+border:none"><span style="border:none">With a virtual machine, you are able to
+							test new applications or operating systems without affecting your host machine.
+							You are also able to save the current machine state
+							when you close the virtual machine. If you have any issues, you have the option
+							to revert the virtual machine to a previously saved state. On the other hand, a
+							virtual machine requires hardware resources from the host machine, such as hard drive space,
+							RAM, and processing power.</span></span></span></p>
+
+			<div class="question-action-container">
+				<button class="MetroBtn show-answer">Show Answer</button>
+				<button class="MetroBtn hide-answer hidden">Hide Answer</button>
+			</div>
+		</div>
+
+		<!-- <p class=BodyTextL25><span class=AnswerGray><span style='color:black;
+border:none'><span style='border:none'>With a virtual machine, you are able to
+test new applications or operating systems without affecting your host machine.
+You are also able to save the cur<span style='border:none'>rent machine state
+when you close the virtual machine. If you have any issues, you have the option
+to revert the virtual machine to a previously saved state. On the other hand, a
+virtual machine requires hardware resources from the host machine, such as ha<span
+style='border:none'>rd drive space, RAM, and processing power.</span></span></span></span></span></p> -->
+
+		<p class="ConfigWindow">End of Document</p>
+		<div class="global-action-container btn__container">
+			<button class="show-all-answers btn-text btn__action">Show All Answers</button>
+			<button class="hide-all-answers btn-text btn__action hidden">Hide All Answers</button>
+			<button class="clear-all-responces btn-text btn__action">Clear My Responses</button>
+		</div>
+
+		<div id="footerDIV"><span><br>
+				<hr><span style="padding-right:5px;float:left;font-family:arial;font-size:12px;">© 2017 - 2022 Cisco
+					and/or its affiliates. All rights reserved. Cisco Public</span><br>
+			</span></div>
+	</div>
+
+
+<script>
+
+	window.addEventListener('load', function () {
+		console.log('loaded');
+		document.querySelectorAll(".AnswerGray").forEach(function (ele) {
+			ele.classList.add("hidden");
+		})
+		document.querySelectorAll(".hide-answer").forEach(function (ele) {
+			ele.classList.add("hidden");
+		})
+		document.querySelectorAll(".show-answer").forEach(function (ele) {
+			ele.addEventListener("click", function (e) {
+				e.currentTarget.nextElementSibling.classList.remove("hidden");
+				e.currentTarget.closest('.question-container').querySelectorAll(".AnswerGray").forEach(function (ele) {
+					ele.classList.remove("hidden");
+				})
+				ele.classList.add("hidden");
+			})
+		})
+		document.querySelectorAll(".hide-answer").forEach(function (ele) {
+			ele.addEventListener("click", function (e) {
+				e.currentTarget.previousElementSibling.classList.remove("hidden");
+				e.currentTarget.closest('.question-container').querySelectorAll(".AnswerGray").forEach(function (ele) {
+					ele.classList.add("hidden");
+				})
+				ele.classList.add("hidden");
+			})
+		})
+		var event = new Event('click', {
+			bubbles: true,
+			cancelable: true,
+		});
+		document.querySelectorAll(".show-all-answers").forEach(function (ele) {
+			ele.addEventListener("click", function (e) {
+				e.currentTarget.nextElementSibling.classList.remove("hidden");
+				ele.classList.add('hidden');
+				document.querySelectorAll(".show-answer").forEach(function (ele) {
+					ele.dispatchEvent(event);
+				})
+			})
+		})
+
+		document.querySelectorAll(".hide-all-answers").forEach(function (ele) {
+			ele.addEventListener("click", function (e) {
+				e.currentTarget.previousElementSibling.classList.remove("hidden");
+				ele.classList.add('hidden');
+				document.querySelectorAll(".hide-answer").forEach(function (ele) {
+					ele.dispatchEvent(event);
+				})
+			})
+		})
+
+		document.querySelectorAll(".clear-all-responces").forEach(function (ele) {
+			ele.addEventListener("click", function (e) {
+				document.querySelectorAll("textArea").forEach(function (ele) {
+					ele.value = "";
+				})
+			})
+		})
+
+
+
+	})
+</script>
+
+</body></html>
