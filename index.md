@@ -109,7 +109,7 @@
 
 | Lab | Тема | Продължителност | Ключови умения |
 |-----|------|-----------------|----------------|
-| **Lab 1** | [Основна мрежова топология](./Lab1_Basic_Network.md) | 60-90 мин | Switch, Router config, IP addressing |
+| **Lab 1** | [Основна мрежова топология](W07/Lab1_Basic_Network.md) | 60-90 мин | Switch, Router config, IP addressing |
 | **Lab 2** | [VLAN и Inter-VLAN Routing](./Lab2_VLANs_InterVLAN.md) | 90-120 мин | VLAN creation, Trunk, Router-on-a-Stick |
 | **Lab 3** | [DHCP конфигурация](./Lab3_DHCP.md) | 60-90 мин | DHCP pools, excluded addresses, relay |
 | **Lab 4** | [DNS конфигурация](./Lab4_DNS.md) | 60-75 мин | A records, CNAME, name resolution |
