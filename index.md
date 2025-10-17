@@ -110,11 +110,11 @@
 | Lab | Тема | Продължителност | Ключови умения |
 |-----|------|-----------------|----------------|
 | **Lab 1** | [Основна мрежова топология](W07/Lab1_Basic_Network.md) | 60-90 мин | Switch, Router config, IP addressing |
-| **Lab 2** | [VLAN и Inter-VLAN Routing](./Lab2_VLANs_InterVLAN.md) | 90-120 мин | VLAN creation, Trunk, Router-on-a-Stick |
-| **Lab 3** | [DHCP конфигурация](./Lab3_DHCP.md) | 60-90 мин | DHCP pools, excluded addresses, relay |
-| **Lab 4** | [DNS конфигурация](./Lab4_DNS.md) | 60-75 мин | A records, CNAME, name resolution |
-| **Lab 5** | [Access Control Lists](./Lab5_ACL.md) | 90-120 мин | Standard/Extended ACL, Security |
-| **Lab 6** | [IoT интеграция](./Lab6_IoT_Integration.md) | 90-120 мин | Sensors, Actuators, Automation |
+| **Lab 2** | [VLAN и Inter-VLAN Routing](W07/Lab2_VLANs_InterVLAN.md) | 90-120 мин | VLAN creation, Trunk, Router-on-a-Stick |
+| **Lab 3** | [DHCP конфигурация](W07/Lab3_DHCP.md) | 60-90 мин | DHCP pools, excluded addresses, relay |
+| **Lab 4** | [DNS конфигурация](W07/Lab4_DNS.md) | 60-75 мин | A records, CNAME, name resolution |
+| **Lab 5** | [Access Control Lists](W07/Lab5_ACL.md) | 90-120 мин | Standard/Extended ACL, Security |
+| **Lab 6** | [IoT интеграция](W07/Lab6_IoT_Integration.md) | 90-120 мин | Sensors, Actuators, Automation |
 
 **Общо време:** ~7-9 часа практическа работа
 
