@@ -1,0 +1,8 @@
+# GitHub Pages Configuration
+
+# Remove the site title completely
+title: ""
+show_downloads: false
+
+# Optional: Change theme if needed
+# theme: jekyll-theme-minimal
