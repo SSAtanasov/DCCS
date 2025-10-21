@@ -45,6 +45,7 @@ Switch FastEthernet0/4 ←→ PC3
 ### Стъпка 1: Влизане в Router
 ```
 Кликнете върху Router → CLI tab
+Натиснете no
 Натиснете Enter
 ```
 
