@@ -180,6 +180,7 @@ R1(config-line)# login
 R1(config-line)# logging synchronous
 R1(config-line)# exit
 ```
+Запишете си паролите на хартия!
 
 **Детайлно обяснение на ВСЯКА команда:**
 
