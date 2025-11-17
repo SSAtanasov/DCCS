@@ -882,6 +882,9 @@ Fa0/5                        notconnect   1          auto    auto  10/100BaseTX
 | **Duplex** | Full/Half duplex | a-full (auto-negotiated full) |
 | **Speed** | Скорост | a-100 (100 Mbps) |
 
+
+Запазете Packet Tracer файла си като: Lab1_YourName.pkt
+
 ---
 
 ## ЗАДАЧИ ЗА САМОСТОЯТЕЛНА РАБОТА
@@ -935,7 +938,7 @@ MySwitch# copy running-config startup-config
 
 ---
 
-### Задача 3: Banner съобщение (ПОПРАВЕНА)
+### Задача 3: Banner съобщение
 
 **Banner** е съобщение, което се показва преди login.
 
