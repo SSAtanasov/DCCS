@@ -435,6 +435,7 @@ SW1(config-if)# ip address 192.168.99.2 255.255.255.0
 SW1(config-if)# no shutdown
 SW1(config-if)# exit
 SW1(config)# ip default-gateway 192.168.99.1
+SW1(config)# exit
 ```
 
 **Обяснение:**
@@ -557,6 +558,7 @@ R1(config-subif)# description Gateway for Management VLAN
 R1(config-subif)# encapsulation dot1Q 99 native
 R1(config-subif)# ip address 192.168.99.1 255.255.255.0
 R1(config-subif)# exit
+R1(config)# exit
 ```
 
 **Обяснение на `native` keyword:**
@@ -600,7 +602,7 @@ GigE0/0.99             192.168.99.1    up                    up
 - Трите subinterfaces имат IP адреси и са активни
 
 ```cisco
-R1# show vlans
+R1# show vlan
 ```
 
 **Очакван резултат:**
@@ -782,7 +784,7 @@ tracert 192.168.20.10
 
 ---
 
-## ЧАСТ 7: Верификационни команди
+## ЧАСТ 7: Верификационни команди (Обобщение)
 
 ### На Router:
 ```cisco
@@ -880,7 +882,7 @@ Trunking Native Mode VLAN: 99
 
 ---
 
-## АНАЛИЗ НА ТРАФИКА (PACKET FLOW)
+## АНАЛИЗ НА ТРАФИКА (PACKET FLOW) - Обяснение
 
 ### Сценарий: PC1 (VLAN 10) ping PC3 (VLAN 20)
 
