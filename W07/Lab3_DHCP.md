@@ -66,7 +66,7 @@ R1(dhcp-config)# network 192.168.10.0 255.255.255.0
 R1(dhcp-config)# default-router 192.168.10.1
 R1(dhcp-config)# dns-server 8.8.8.8 8.8.4.4
 R1(dhcp-config)# domain-name company.local
-R1(dhcp-config)# lease 7
+R1(dhcp-config)# lease 7 - не работи в Packet Tracer
 R1(dhcp-config)# exit
 ```
 
@@ -93,10 +93,11 @@ R1(dhcp-config)# network 192.168.20.0 255.255.255.0
 R1(dhcp-config)# default-router 192.168.20.1
 R1(dhcp-config)# dns-server 8.8.8.8 8.8.4.4
 R1(dhcp-config)# domain-name company.local
-R1(dhcp-config)# lease 7
+R1(dhcp-config)# lease 7 - не работи в Packet Tracer
 R1(dhcp-config)# exit
 !
 R1(config)# ip dhcp excluded-address 192.168.20.1 192.168.20.10
+R1(config)# exit
 ```
 
 ### Стъпка 5: Записване на конфигурацията
@@ -118,10 +119,10 @@ R1# copy running-config startup-config
 **След 3-5 секунди трябва да видите:**
 ```
 DHCP Request Successful
-IP Address: 192.168.10.11 (примерно)
+IP Address: 192.168.10.12 (примерно)
 Subnet Mask: 255.255.255.0
 Default Gateway: 192.168.10.1
-DNS Server: 8.8.8.8
+DNS Server: 8.8.4.4
 ```
 
 ### Ако не работи веднага:
@@ -182,7 +183,7 @@ Pool ADMIN_POOL :
 
 ### Test 4: Проверка на DHCP статистиката
 ```cisco
-R1# show ip dhcp server statistics
+R1# show ip dhcp server statistics - липсва в Packet Tracer
 
 Memory usage         12345
 Address pools        2
@@ -198,7 +199,7 @@ Malformed messages   0
 От PC1:
 ping 192.168.10.1     (gateway)
 ping 192.168.20.1     (другия gateway)
-ping 8.8.8.8          (DNS server)
+ping 8.8.4.4          (DNS server)
 ```
 
 ---
@@ -453,3 +454,8 @@ show ip dhcp conflict
 - Name resolution в мрежата
 
 **Запазете файла като:** `Lab3_DHCP_YourName.pkt`
+
+<script data-goatcounter="https://satanasov.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+<script src="/SNA/assets/js/analytics-logger.js"></script>
