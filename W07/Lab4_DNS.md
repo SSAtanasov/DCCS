@@ -29,7 +29,7 @@
 
 ### Устройства:
 - Добавете 1x Server-PT (за DNS)
-- Свържете го към SW1 на порт Fa0/1
+- Свържете го към SW1 на порт Fa0/11
 
 ---
 
@@ -38,7 +38,7 @@
 ### Назначаване на порта към VLAN
 ```cisco
 SW1# configure terminal
-SW1(config)# interface FastEthernet0/1
+SW1(config)# interface FastEthernet0/11
 SW1(config-if)# switchport mode access
 SW1(config-if)# switchport access vlan 10
 SW1(config-if)# description DNS-Server
@@ -439,3 +439,8 @@ ip dhcp pool ADMIN_POOL
 - Security policies
 
 **Запазете файла като:** `Lab4_DNS_YourName.pkt`
+
+<script data-goatcounter="https://satanasov.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+<script src="/SNA/assets/js/analytics-logger.js"></script>
