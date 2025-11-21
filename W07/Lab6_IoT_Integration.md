@@ -43,7 +43,7 @@ IoT Устройства → Home Gateway/MCU → Network → IoT Server → М�
 ### Устройства за добавяне:
 
 **IoT компоненти:**
-1. **Home Gateway** (от Smart Devices → Home)
+1. **Home Gateway** (от Network Devices → Wireless)
 2. **Motion Detector** (от Sensors)
 3. **Smart LED** (от Actuators)
 4. **Smart Door** (от Actuators)
