@@ -36,8 +36,8 @@ IoT Устройства → Home Gateway/MCU → Network → IoT Server → М�
                      |
                 [Switch SW1]
           /     |     |      \      \
-       DNS   Admin  IoT    IoT    IoT
-      Server  PC   Gateway Sensor Lamp
+       DNS   Admin  Home    IoT    IoT
+      Server  PC3   Gateway Sensor Lamp
 ```
 
 ### Устройства за добавяне:
@@ -54,7 +54,7 @@ IoT Устройства → Home Gateway/MCU → Network → IoT Server → М�
 
 ---
 
-## ЧАСТ 3: Конфигурация на IoT Gateway (25 мин)
+## ЧАСТ 3: Конфигурация на Home Gateway (25 мин)
 
 ### Стъпка 1: Физическа свързаност
 
@@ -70,7 +70,7 @@ SW1(config-if)# description IoT-Gateway
 SW1(config-if)# exit
 ```
 
-### Стъпка 2: IP конфигурация на Gateway
+### Стъпка 2: IP конфигурация на Home Gateway
 
 **Кликнете на Home Gateway → Config tab:**
 
@@ -123,7 +123,7 @@ Password: SecureIoT123
 Клик на Advanced Tab
 ```
 
-### Стъпка 3: Регистрация към Gateway
+### Стъпка 3: Регистрация към Home Gateway
 
 **На Motion Detector → Config → IoT Server:**
 ```
@@ -137,11 +137,11 @@ Password: SecureIoT123
 
 ---
 
-## ЧАСТ 5: Добавяне на актуатор - Smart LED (15 мин)
+## ЧАСТ 5: Добавяне на актуатор - Street Lamp (15 мин)
 
-### Стъпка 1: Добавяне на Smart LED
+### Стъпка 1: Добавяне на Street Lamp
 
-**От Actuators → Smart LED (или Old Lamp за по-прост вариант)**
+**От Actuators → Street Lamp**
 
 ### Стъпка 2: Wireless конфигурация
 
@@ -155,12 +155,8 @@ Password: SecureIoT123
 
 **IoT Server:**
 ```
-Registration Server: 192.168.20.50
-Username: admin
-Password: admin
+Advanced → Home Gateway
 ```
-
-**Кликнете: Connect**
 
 ### Стъпка 4: Тест на ръчно управление
 
