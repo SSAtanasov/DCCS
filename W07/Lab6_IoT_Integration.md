@@ -561,3 +561,9 @@ show running-config
 **Автор:** гл. ас. Светослав Атанасов  
 **Тракийски университет - Стара Загора**  
 **Курс:** Проектиране на комуникационни и компютърни системи
+
+
+<script data-goatcounter="https://satanasov.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+<script src="/SNA/assets/js/analytics-logger.js"></script>
