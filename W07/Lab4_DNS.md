@@ -153,17 +153,7 @@ Pinging server.company.local [192.168.10.2] with 32 bytes of data:
 Reply from 192.168.10.2: bytes=32 time<1ms TTL=128
 ```
 
-### Test 2: Ping CNAME record
-```
-ping www.company.local
-```
-
-**Какво се случва:**
-```
-www.company.local → (CNAME) → web.company.local → (A) → 192.168.10.3
-```
-
-### Test 3: nslookup команда
+### Test 2: nslookup команда
 
 **От PC (Command Prompt):**
 ```
@@ -179,12 +169,7 @@ Name: server.company.local
 Address: 192.168.10.2
 ```
 
-### Test 4: Reverse DNS lookup (опционално)
-```
-nslookup 192.168.10.2
-```
-
-### Test 5: nslookup с конкретен DNS server
+### Test 3: nslookup с конкретен DNS server
 ```
 nslookup router.company.local 192.168.10.2
 ```
@@ -255,6 +240,17 @@ http://www.company.local
 ```
 
 **Трябва да видите вашия HTML!**
+
+
+### От PC1 → Test: Ping CNAME record
+```
+ping www.company.local
+```
+
+**Какво се случва:**
+```
+www.company.local → (CNAME) → web.company.local → (A) → 192.168.10.3
+```
 
 ---
 
