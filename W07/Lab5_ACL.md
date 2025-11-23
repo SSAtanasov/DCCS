@@ -549,7 +549,8 @@ PC1 (VLAN 10) иска да достъпи PC3 (VLAN 20):
 ```
 От PC1 (192.168.10.11):
 C:\> ping 192.168.20.11
-Request timed out. ❌
+Очакван резултат:
+Reply from 192.168.10.1: Destination host unreachable. ❌
 
 От PC2 (192.168.10.12):
 C:\> ping 192.168.20.11
@@ -609,7 +610,7 @@ Inbound  access list is not set
 
 ---
 
-### Стъпка 5: Премахване на ACL (ако трябва)
+### Стъпка 5: Премахване на ACL (ако сте сгрешили и се налага корекция)
 
 ```cisco
 R1(config)# interface GigE0/0.20
@@ -1053,26 +1054,24 @@ R1(config-line)# exit
 
 ### Стъпка 3: Тестване
 
+Тъй като SSH/Telnet са сложни в PT, може просто да тествате че ACL работи с ping:
+
 **От PC1 (Admin VLAN - 192.168.10.11):**
 
 ```
-C:\> ssh -l admin 192.168.10.1
-Password: cisco123
-
-R1> enable
-Password: [enable secret]
-R1# 
-
-SUCCESS! ✅
+**От PC1 (Admin VLAN):**
 ```
-
-**От PC3 (IT VLAN - 192.168.20.11):**
-
+ping 192.168.10.1
 ```
-C:\> ssh -l admin 192.168.10.1
-% Connection refused by remote host
+**Резултат:** ✅ Reply from 192.168.10.1
 
-BLOCKED! ❌
+**От PC3 (IT VLAN):**
+```
+ping 192.168.10.1
+
+Destination host unreachable ❌
+
+Обяснение: ACL 100 блокира трафика от 192.168.20.0/24 към 192.168.10.1, поради което PC3 не може да достигне router-а, докато PC1 може.
 ```
 
 ---
