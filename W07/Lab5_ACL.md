@@ -1033,7 +1033,7 @@ R1(config-line)# exit
 ```cisco
 R1(config)# access-list 50 remark SSH Access Control
 R1(config)# access-list 50 permit 192.168.10.0 0.0.0.255
-R1(config)# access-list 50 deny any log
+R1(config)# access-list 50 deny any
 R1(config)# line vty 0 4
 R1(config-line)# access-class 50 in
 R1(config-line)# exit
@@ -1045,7 +1045,7 @@ R1(config-line)# exit
 |---------|-------------|
 | `access-list 50` | Standard ACL (само source IP) |
 | `permit 192.168.10.0 0.0.0.255` | Позволява Admin VLAN |
-| `deny any log` | Блокира всички останали + логва |
+| `deny any` | Блокира всички останали |
 | `access-class 50 in` | Прилага ACL към VTY линии |
 
 **Важно:** За VTY линии използваме `access-class`, не `ip access-group`!
@@ -1073,21 +1073,6 @@ Destination host unreachable ❌
 
 Обяснение: ACL 100 блокира трафика от 192.168.20.0/24 към 192.168.10.1, поради което PC3 не може да достигне router-а, докато PC1 може.
 ```
-
----
-
-### Стъпка 4: Проверка на логове
-
-```cisco
-R1# show logging
-```
-
-**Ще видите:**
-```
-%SEC-6-IPACCESSLOGP: list 50 denied tcp 192.168.20.11(12345) -> 192.168.10.1(22)
-```
-
-**Keyword `log`** в ACL-а записва в логове всеки блокиран опит!
 
 ---
 
@@ -1343,24 +1328,6 @@ R1(config)# access-list 110 permit ip any any
 
 ---
 
-### Задача 4: Log analysis
-
-Добавете `log` keyword към deny правила:
-
-```cisco
-access-list 100 deny ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 log
-```
-
-Направете опити за блокиран трафик, после:
-
-```cisco
-R1# show logging
-```
-
-Анализирайте кой се опитва да достъпи какво!
-
----
-
 ## BEST PRACTICES ЗА ACL
 
 ```
@@ -1372,7 +1339,6 @@ R1# show logging
 ✅ Тествайте преди production!
 ✅ Документирайте в таблица
 ✅ Записвайте конфигурацията след промени
-✅ Използвайте "log" за security events
 ✅ Периодично проверявайте "show access-lists"
 ```
 
@@ -1443,7 +1409,7 @@ interface GigE0/0.10
 ### VTY Access:
 ```cisco
 access-list 50 permit 192.168.10.0 0.0.0.255
-access-list 50 deny any log
+access-list 50 deny any
 line vty 0 4
  access-class 50 in
 ```
@@ -1462,7 +1428,6 @@ interface Fa0/2
 ```cisco
 show access-lists
 show ip interface GigE0/0.20
-show logging
 show port-security interface Fa0/2
 show port-security address
 ```
