@@ -120,24 +120,19 @@ Password: SecureIoT123
 
 **Advanced:**
 ```
-Auto Config (IoT Server): OFF (ще го направим ръчно)
+Клик на Advanced Tab
 ```
 
 ### Стъпка 3: Регистрация към Gateway
 
 **На Motion Detector → Config → IoT Server:**
 ```
-Registration Server: 192.168.20.50
-(IP адресът на Home Gateway)
-Username: admin
-Password: admin
+Изберете Home Gateway
 ```
-
-**Кликнете: Connect**
 
 ### Стъпка 4: Верификация
 
-**На Home Gateway → IoT Server tab:**
+**На PC3 → Web Browser → 192.168.20.50**
 - Трябва да видите Motion Detector в списъка с регистрирани устройства
 
 ---
