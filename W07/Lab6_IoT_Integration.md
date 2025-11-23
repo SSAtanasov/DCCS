@@ -43,11 +43,11 @@ IoT Устройства → Home Gateway/MCU → Network → IoT Server → М�
 ### Устройства за добавяне:
 
 **IoT компоненти:**
-1. **Home Gateway** (от Network Devices → Wireless)
-2. **Motion Detector** (от Sensors)
-3. **Smart LED** (от Actuators)
-4. **Smart Door** (от Actuators)
-5. **Temperature Monitor** (от Sensors)
+1. **Home Gateway** (от Network Devices → Wireless Devices)
+2. **Motion Detector** (от Components → Sensors)
+3. **Smart LED** (от Components → Actuators)
+4. **Door** (от Components → Actuators)
+5. **Temperature Monitor** (от Components → Sensors)
 
 **Кабели:**
 - Wireless или Ethernet (зависи от устройството)
@@ -74,10 +74,9 @@ SW1(config-if)# exit
 
 **Кликнете на Home Gateway → Config tab:**
 
-**FastEthernet 0 (Wired):**
+**LAN (Wired):**
 ```
-DHCP: ON
-(или статично)
+Статично
 IP Address: 192.168.20.50
 Subnet Mask: 255.255.255.0
 Default Gateway: 192.168.20.1
@@ -92,7 +91,7 @@ Password: SecureIoT123
 
 ### Стъпка 3: Проверка на свързаността
 
-**От Admin PC:**
+**От Admin PC3:**
 ```
 ping 192.168.20.50
 ```
