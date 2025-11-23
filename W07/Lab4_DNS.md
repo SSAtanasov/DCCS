@@ -212,9 +212,15 @@ R1(config)# ip host switch.company.local 192.168.99.2
 ### Стъпка 2: Конфигурирайте HTTP Service
 
 **Server → Services → HTTP:**
+
 1. Включете HTTP (ON)
-2. Edit `index.html`:
-```html
+2. Кликнете на **index.html** за редакция
+3. **Изтрийте** целия стар Cisco Packet Tracer код
+4. **Копирайте и поставете** следния HTML код:
+```
+
+Следва новият код (на нов ред без backticks в markdown):
+```
 <!DOCTYPE html>
 <html>
 <head><title>Company Website</title></head>
@@ -225,7 +231,9 @@ R1(config)# ip host switch.company.local 192.168.99.2
 </body>
 </html>
 ```
-3. Save
+```markdown
+5. Кликнете **Save**
+```
 
 ### Стъпка 3: Актуализирайте DNS
 
