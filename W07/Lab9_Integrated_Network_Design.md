@@ -182,7 +182,7 @@ Sales  Eng        Mgmt Guest Servers
 **Устройства:**
 - 1x Router 2911 (R1)
 - 3x Switch 2960-24TT (SW1-Core, SW2-Access, SW3-Access)
-- 15x PC за потребители
+- 20x PC за потребители
 - 2x Server (Web, DNS)
 - 1x Cloud (Internet simulation)
 
