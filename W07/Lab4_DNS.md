@@ -21,7 +21,7 @@
                    |
               [Switch SW1]
          /     |     |     \     \
-      Fa0/1 Fa0/2 Fa0/3 Fa0/4 Fa0/5
+      Fa0/11 Fa0/2 Fa0/3 Fa0/4 Fa0/5
         |     |     |     |     |
     [Server] [PC1] [PC2] [PC3] [PC4]
      DNS    Admin Admin  IT    IT
