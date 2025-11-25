@@ -191,6 +191,16 @@ nslookup router.company.local 192.168.10.2
 - DNS: 192.168.10.2
 - Свържете към SW1 на порт Fa0/6 (VLAN 10)
 
+```cisco
+SW1# configure terminal
+SW1(config)# interface FastEthernet0/6
+SW1(config-if)# switchport mode access
+SW1(config-if)# switchport access vlan 10
+SW1(config-if)# description Web-Server
+SW1(config-if)# exit
+SW1(config)# exit
+```
+
 ### Стъпка 2: Конфигурирайте HTTP Service
 
 **Server → Services → HTTP:**
