@@ -200,7 +200,7 @@ IP Configuration: Static
 IP Address: 192.168.20.100
 Subnet Mask: 255.255.255.0
 Default Gateway: 192.168.20.1
-DNS Server: 192.168.20.10
+DNS Server: 192.168.10.2
 ```
 
 ### Стъпка 4: Активиране на IoT услугата
