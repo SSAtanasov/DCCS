@@ -64,7 +64,8 @@ R1(config)# no ip domain-lookup
 R1(config)# ip dhcp pool ADMIN_POOL
 R1(dhcp-config)# network 192.168.10.0 255.255.255.0
 R1(dhcp-config)# default-router 192.168.10.1
-R1(dhcp-config)# dns-server 8.8.8.8 8.8.4.4
+R1(dhcp-config)# dns-server 8.8.8.8
+R1(dhcp-config)# dns-server 8.8.4.4
 R1(dhcp-config)# domain-name company.local
 R1(dhcp-config)# lease 7 - не работи в Packet Tracer
 R1(dhcp-config)# exit
