@@ -1212,3 +1212,9 @@ tracert 8.8.8.8                   # Trace route to Internet
 
 **Дата на ревизия:** 2025
 **Версия:** 2.0 (с ISP Router и коригиран VLAN 50)
+
+
+<script data-goatcounter="https://satanasov.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+<script src="/SNA/assets/js/analytics-logger.js"></script>
