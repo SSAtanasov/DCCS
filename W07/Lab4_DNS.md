@@ -70,6 +70,8 @@ DNS Server: 127.0.0.1  (посочва към себе си)
 
 ### Стъпка 3: Добавяне на DNS records
 
+A Record е основният тип DNS запис, който свързва домейн име директно с IPv4 адрес.
+
 **Add следните A records:**
 
 | Name              | Type | Address       | TTL  |
@@ -90,6 +92,8 @@ DNS Server: 127.0.0.1  (посочва към себе си)
 5. Повторете за всички записи
 
 ### Стъпка 4: Добавяне на CNAME records (Aliases)
+
+CNAME Record е псевдоним (alias), който сочи към друго домейн име, не директно към IP адрес.
 
 | Name              | Type  | Address              | TTL  |
 |-------------------|-------|----------------------|------|
@@ -176,29 +180,7 @@ nslookup router.company.local 192.168.10.2
 
 ---
 
-## ЧАСТ 6: DNS на Router (като DNS Forwarder)
-
-### Концепция:
-Router може да действа като DNS proxy/forwarder за клиентите.
-
-### Конфигурация (BONUS):
-```cisco
-R1(config)# ip dns server
-R1(config)# ip domain-lookup
-R1(config)# ip name-server 192.168.10.2
-!
-R1(config)# ip host router.company.local 192.168.10.1
-R1(config)# ip host switch.company.local 192.168.99.2
-```
-
-**Какво прави:**
-- Router приема DNS queries от клиентите
-- Проверява локалните `ip host` записи
-- Ако не намери, форвардва към 192.168.10.2
-
----
-
-## ЧАСТ 7: Добавяне на Web Server (BONUS - 15 мин)
+## ЧАСТ 6: Добавяне на Web Server (BONUS - 15 мин)
 
 ### Стъпка 1: Добавете Server за Web
 
@@ -262,7 +244,7 @@ www.company.local → (CNAME) → web.company.local → (A) → 192.168.10.3
 
 ---
 
-## ЧАСТ 8: Troubleshooting DNS (10 мин)
+## ЧАСТ 7: Troubleshooting DNS (10 мин)
 
 ### Проблем 1: "Ping request could not find host"
 
@@ -301,7 +283,7 @@ ipconfig /renew
 
 ---
 
-## ЧАСТ 9: Advanced DNS - Multiple Domains
+## ЧАСТ 8: Advanced DNS - Multiple Domains
 
 ### Scenario: Искате вътрешен и външен домейн
 
