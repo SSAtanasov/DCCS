@@ -537,3 +537,9 @@ ip nat inside source list 1 interface GigabitEthernet0/1 overload
 **Запази .pkt файла като `Lab8_NAT_Configuration.pkt`**
 
 **ВАЖНО:** Този лаб използва ISP Router вместо Cloud устройство за реалистична симулация.
+
+
+<script data-goatcounter="https://satanasov.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+
+<script src="/SNA/assets/js/analytics-logger.js"></script>
