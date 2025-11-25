@@ -2,6 +2,9 @@
 
 **Продължителност:** 120-150 минути  
 **Цел:** Изграждане на правилна йерархична мрежа (Access/Distribution/Core) с Layer 3 routing, QoS и redundancy
+**Prerequisite:** Завършени Lab 1-6 (особено Lab 2 за VLAN, Lab 5 за ACL)
+---
+> **ВАЖНО:** Този лаб използва **нова топология**, различна от Lab 1-6. Целта е да демонстрира enterprise-grade йерархичен дизайн (Core/Distribution/Access) с multilayer switches. Концепциите от предишните лабове (VLAN, ACL, DHCP) се прилагат в по-мащабна среда.
 
 ---
 
