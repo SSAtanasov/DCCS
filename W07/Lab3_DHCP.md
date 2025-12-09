@@ -1,17 +1,62 @@
 # LAB 3: DHCP КОНФИГУРАЦИЯ
-## Dynamic Host Configuration Protocol
+## Dynamic Host Configuration Protocol - Автоматично IP адресиране
 
-**Цел:** Да се научите да конфигурирате DHCP на Router и да автоматизирате IP адресирането на устройствата.
+**Цел:** Да се научите да конфигурирате DHCP за автоматично раздаване на IP адреси.
 
-**Продължителност:** 60-90 минути
+**Продължителност:** 60 минути
 
 **Prerequisite:** Завършен Lab 2 (VLAN-и и Inter-VLAN routing)
 
 ---
 
-## ЧАСТ 1: Топология - продължаваме от Lab 2
+## ЧАСТ 1: Какво е DHCP? (5 мин)
 
-### Използваме същата топология:
+### Проблем без DHCP:
+
+```
+❌ Администраторът трябва РЪЧНО да конфигурира всеки PC:
+   - IP Address
+   - Subnet Mask  
+   - Default Gateway
+   - DNS Server
+
+❌ Голям риск от грешки (duplicate IP)
+❌ Много време при 50+ компютъра
+```
+
+### Решение с DHCP:
+
+```
+✅ PC се включва в мрежата
+✅ Автоматично получава всички настройки
+✅ Няма грешки, няма duplicate IP-та
+✅ Бърза конфигурация
+```
+
+### Как работи? (DORA процес)
+
+```
+1. PC:      "Има ли тук DHCP server?" (DISCOVER)
+2. Server:  "Да! Ето ти IP: 192.168.10.11" (OFFER)
+3. PC:      "OK, приемам го" (REQUEST)
+4. Server:  "Потвърдено!" (ACK)
+```
+
+### Какво получава PC-то?
+
+| Параметър | Стойност | Обяснение |
+|-----------|----------|-----------|
+| IP Address | 192.168.10.11 | Адресът на PC-то |
+| Subnet Mask | 255.255.255.0 | Размер на мрежата |
+| Default Gateway | 192.168.10.1 | Router за излизане от мрежата |
+| DNS Server | 8.8.8.8 | Google DNS за имена |
+
+---
+
+## ЧАСТ 2: Топология (5 мин)
+
+Продължаваме със същата топология от Lab 2:
+
 ```
               [Router R1]
                    |
@@ -25,425 +70,423 @@
        VLAN10 VLAN10 VLAN20 VLAN20
 ```
 
-### VLAN-и:
-- VLAN 10 - Administration (192.168.10.0/24)
-- VLAN 20 - IT Department (192.168.20.0/24)
-- VLAN 99 - Management (192.168.99.0/24)
+**VLAN-и:**
+- VLAN 10: 192.168.10.0/24
+- VLAN 20: 192.168.20.0/24
 
 ---
 
-## ЧАСТ 2: Какво е DHCP? (Теория - 10 мин)
+## ЧАСТ 3: Метод 1 - Router като DHCP сървър (25 мин)
 
-### DHCP процесът (DORA):
+### Стъпка 1: Excluded addresses (запазени адреси)
+
+**Защо?** Запазваме първите 10 адреса за статични устройства:
+
 ```
-1. DISCOVER  - Client: "Има ли тук DHCP server?"
-2. OFFER     - Server: "Да! Ето ти IP адрес"
-3. REQUEST   - Client: "OK, искам този адрес"
-4. ACK       - Server: "Потвърдено! Адресът е твой"
+.1 = Router (Gateway)
+.2 = DNS Server (ако имаме)
+.3 = Web Server (ако имаме)
+.4-.10 = Резерв за други сървъри
 ```
 
-### Какво получава клиентът:
-- IP Address
-- Subnet Mask
-- Default Gateway
-- DNS Server(s)
-- Lease time (колко време е валиден IP-то)
-
----
-
-## ЧАСТ 3: Конфигурация на DHCP pools (25 мин)
-
-### Стъпка 1: Изключване на DNS lookup (ако не е направено)
 ```cisco
 R1# configure terminal
 R1(config)# no ip domain-lookup
+!
+R1(config)# ip dhcp excluded-address 192.168.10.1 192.168.10.10
+R1(config)# ip dhcp excluded-address 192.168.20.1 192.168.20.10
 ```
 
-### Стъпка 2: Създаване на DHCP pool за VLAN 10
+### Стъпка 2: DHCP pool за VLAN 10
+
 ```cisco
 R1(config)# ip dhcp pool ADMIN_POOL
 R1(dhcp-config)# network 192.168.10.0 255.255.255.0
 R1(dhcp-config)# default-router 192.168.10.1
 R1(dhcp-config)# dns-server 8.8.8.8
-R1(dhcp-config)# dns-server 8.8.4.4
-R1(dhcp-config)# domain-name company.local
-R1(dhcp-config)# lease 7 - не работи в Packet Tracer
 R1(dhcp-config)# exit
 ```
 
-**Обяснение на параметрите:**
-- `network` - адресното пространство на мрежата
-- `default-router` - gateway за клиентите
-- `dns-server` - DNS сървъри (Google DNS в примера)
-- `domain-name` - домейн за локалното име
-- `lease 7` - IP адресът е валиден за 7 дни
+**Обяснение:**
+- `network` → Коя мрежа обслужва този pool
+- `default-router` → Gateway-ят (Router interface IP)
+- `dns-server` → DNS за name resolution
 
-### Стъпка 3: Изключване на адреси (exclude addresses)
-```cisco
-R1(config)# ip dhcp excluded-address 192.168.10.1 192.168.10.10
-```
+### Стъпка 3: DHCP pool за VLAN 20
 
-**Защо?** Запазваме 192.168.10.1-10 за статични устройства:
-- .1 = Gateway (Router)
-- .2-.10 = Сървъри, принтери, мрежови устройства
-
-### Стъпка 4: DHCP pool за VLAN 20
 ```cisco
 R1(config)# ip dhcp pool IT_POOL
 R1(dhcp-config)# network 192.168.20.0 255.255.255.0
 R1(dhcp-config)# default-router 192.168.20.1
-R1(dhcp-config)# dns-server 8.8.8.8 8.8.4.4
-R1(dhcp-config)# domain-name company.local
-R1(dhcp-config)# lease 7 - не работи в Packet Tracer
+R1(dhcp-config)# dns-server 8.8.8.8
 R1(dhcp-config)# exit
-!
-R1(config)# ip dhcp excluded-address 192.168.20.1 192.168.20.10
-R1(config)# exit
 ```
 
-### Стъпка 5: Записване на конфигурацията
+### Стъпка 4: Запазване
+
 ```cisco
+R1(config)# exit
 R1# copy running-config startup-config
 ```
 
+**Забележка:** На Router НЕ можем да настроим lease time в Packet Tracer.
+
 ---
 
-## ЧАСТ 4: Конфигурация на PC-та за DHCP (15 мин)
+## ЧАСТ 4: Метод 2 - Server като DHCP (BONUS - 15 мин)
+
+### Предимства на Server метода:
+
+✅ Има GUI (по-лесно за начинаещи)  
+✅ **Lease Time работи!** (можем да настроим часове/дни)  
+✅ Виждаме всички настройки наведнъж  
+
+### Топология със Server:
+
+```
+              [Router R1]
+                   |
+            GigE0/0 (trunk)
+                   |
+              [Switch SW1]
+          /     |     |     \     \
+       Fa0/11 Fa0/2 Fa0/3 Fa0/4 Fa0/5
+         |     |     |     |     |
+     [Server] [PC1] [PC2] [PC3] [PC4]
+      DHCP   VLAN10 VLAN10 VLAN20 VLAN20
+```
+
+### Стъпка 1: Добавяне на Server
+
+1. **Devices → End Devices → Server-PT**
+2. Свържете към **SW1 FastEthernet0/11**
+
+```cisco
+SW1(config)# interface FastEthernet0/11
+SW1(config-if)# switchport mode access
+SW1(config-if)# switchport access vlan 10
+SW1(config-if)# description DHCP-Server
+SW1(config-if)# exit
+```
+
+### Стъпка 2: IP на Server-а
+
+**Кликнете: Server → Desktop → IP Configuration**
+
+```
+IP Address: 192.168.10.2
+Subnet Mask: 255.255.255.0
+Default Gateway: 192.168.10.1
+```
+
+### Стъпка 3: Конфигурация на DHCP Service
+
+**Кликнете: Server → Services → DHCP**
+
+1. **Включете DHCP:** ON
+
+2. **Pool за VLAN 10:**
+   ```
+   Pool Name: ADMIN_POOL
+   Default Gateway: 192.168.10.1
+   DNS Server: 8.8.8.8
+   Start IP Address: 192.168.10.11
+   Subnet Mask: 255.255.255.0
+   Maximum Number of Users: 50
+   TFTP Server: (празно)
+   WLC Address: (празно)
+   Lease Time: 1 Days (или колкото искате!)
+   ```
+   → Кликнете **Add**
+
+3. **Pool за VLAN 20:**
+   ```
+   Pool Name: IT_POOL
+   Default Gateway: 192.168.20.1
+   DNS Server: 8.8.8.8
+   Start IP Address: 192.168.20.11
+   Subnet Mask: 255.255.255.0
+   Maximum Number of Users: 50
+   Lease Time: 7 Days
+   ```
+   → Кликнете **Add**
+
+### Стъпка 4: DHCP Relay на Router
+
+**Защо?** Server е в VLAN 10, но трябва да обслужва и VLAN 20.
+
+```cisco
+R1(config)# interface GigabitEthernet0/0.20
+R1(config-subif)# ip helper-address 192.168.10.2
+R1(config-subif)# exit
+```
+
+**Какво прави:** Препраща DHCP заявки от VLAN 20 към Server-а.
+
+---
+
+## ЧАСТ 5: Конфигурация на PC-тата (10 мин)
 
 ### За всеки PC (PC1, PC2, PC3, PC4):
 
-1. Кликнете на PC → Desktop → IP Configuration
-2. Изберете: **DHCP** (вместо Static)
-3. Кликнете: **DHCP** бутон
-4. Изчакайте за адрес
+1. **Кликнете:** PC → Desktop → IP Configuration
+2. **Изберете:** DHCP (вместо Static)
+3. **Кликнете:** Бутона DHCP
+4. **Изчакайте** 3-5 секунди
 
-**След 3-5 секунди трябва да видите:**
+**Трябва да видите:**
 ```
-DHCP Request Successful
-IP Address: 192.168.10.12 (примерно)
+IP Address: 192.168.10.11 (или друг)
 Subnet Mask: 255.255.255.0
 Default Gateway: 192.168.10.1
-DNS Server: 8.8.4.4
+DNS Server: 8.8.8.8
 ```
 
-### Ако не работи веднага:
+### Ако не работи:
+
+**Command Prompt:**
 ```
-Command Prompt на PC:
 ipconfig /release
 ipconfig /renew
 ```
 
 ---
 
-## ЧАСТ 5: Верификация и тестване (20 мин)
+## ЧАСТ 6: Проверка (10 мин)
 
 ### Test 1: Проверка на получените адреси
 
-**На всеки PC (Command Prompt):**
+**На PC (Command Prompt):**
 ```
 ipconfig
 ```
 
-**Очакван резултат за PC1 (VLAN 10):**
+**Очаквано за PC1 (VLAN 10):**
 ```
-IP Address: 192.168.10.11 (или друг в диапазона 11-254)
+IP Address: 192.168.10.11
 Subnet Mask: 255.255.255.0
 Default Gateway: 192.168.10.1
 ```
 
-### Test 2: Проверка на DHCP сървъра
+### Test 2: Проверка на DHCP bindings
 
-**На Router:**
+**Метод 1 (Router като DHCP):**
 ```cisco
 R1# show ip dhcp binding
 ```
 
 **Очакван изход:**
 ```
-IP address       Client-ID/              Lease expiration        Type
-                 Hardware address
-192.168.10.11    0001.6373.7ABF          Jun 15 2024 12:30 PM    Automatic
-192.168.10.12    0002.16CE.E0F3          Jun 15 2024 12:31 PM    Automatic
-192.168.20.11    00D0.BC0F.0D4C          Jun 15 2024 12:32 PM    Automatic
+IP address       Hardware address        Type
+192.168.10.11    0001.6373.7ABF         Automatic
+192.168.10.12    0002.16CE.E0F3         Automatic
+192.168.20.11    00D0.BC0F.0D4C         Automatic
 ```
 
-### Test 3: Проверка на DHCP pool статистики
-```cisco
-R1# show ip dhcp pool
+**Метод 2 (Server като DHCP):**
+- **Server → Services → DHCP**
+- Вижте таблицата **Current Leases**
 
-Pool ADMIN_POOL :
- Utilization mark (high/low)    : 100 / 0
- Subnet size (first/next)       : 0 / 0 
- Total addresses                : 254
- Leased addresses               : 2
- Pending event                  : none
- 1 subnet is currently in the pool :
- Current index        IP address range                    Leased addresses
- 192.168.10.12        192.168.10.1     - 192.168.10.254   2
+### Test 3: Ping тест
+
+**От PC1:**
 ```
-
-### Test 4: Проверка на DHCP статистиката
-```cisco
-R1# show ip dhcp server statistics - липсва в Packet Tracer
-
-Memory usage         12345
-Address pools        2
-Database agents      0
-Automatic bindings   4
-Manual bindings      0
-Expired bindings     0
-Malformed messages   0
-```
-
-### Test 5: Тестване на connectivity
-```
-От PC1:
 ping 192.168.10.1     (gateway)
-ping 192.168.20.1     (другия gateway)
-ping 8.8.4.4          (DNS server)
+ping 192.168.10.12    (друг PC в VLAN 10)
+ping 192.168.20.1     (gateway VLAN 20)
+ping 192.168.20.11    (PC в VLAN 20)
 ```
+
+**Всички трябва да работят!** ✅
 
 ---
 
-## ЧАСТ 6: DHCP Relay Agent (BONUS - Advanced)
-
-### Scenario:
-Ако имаме DHCP server на отделна мрежа или на втори router, използваме DHCP Relay.
-
-### Пример - DHCP сървър на друга мрежа:
-
-```cisco
-R1(config)# interface GigabitEthernet0/0.10
-R1(config-subif)# ip helper-address 192.168.100.10
-R1(config-subif)# exit
-!
-R1(config)# interface GigabitEthernet0/0.20
-R1(config-subif)# ip helper-address 192.168.100.10
-R1(config-subif)# exit
-```
-
-**Какво прави `ip helper-address`?**
-- Препраща DHCP DISCOVER broadcast като unicast към посочения сървър
-- Позволява централизиран DHCP сървър за множество subnet-и
-
----
-
-## ЧАСТ 7: Troubleshooting DHCP (15 мин)
+## ЧАСТ 7: Troubleshooting (10 мин)
 
 ### Проблем 1: PC не получава адрес
 
-**Debug на Router:**
+**Симптоми:**
+```
+DHCP Request Failed
+IP Address: 0.0.0.0
+```
+
+**Проверки:**
 ```cisco
-R1# debug ip dhcp server events
-R1# debug ip dhcp server packet
-```
-
-**Тествайте отново на PC:**
-```
-ipconfig /release
-ipconfig /renew
-```
-
-**Гледайте output-а на Router - трябва да видите:**
-```
-DHCPD: DHCPDISCOVER received from client 0001.6373.7ABF
-DHCPD: Sending DHCPOFFER to client 0001.6373.7ABF (192.168.10.11)
-DHCPD: DHCPREQUEST received from client 0001.6373.7ABF
-DHCPD: Sending DHCPACK to client 0001.6373.7ABF (192.168.10.11)
-```
-
-**Изключване на debug:**
-```cisco
-R1# undebug all
-```
-
-### Проблем 2: Грешен gateway
-
-**Проверка на pool конфигурацията:**
-```cisco
-R1# show running-config | section dhcp
-```
-
-**Корекция:**
-```cisco
-R1(config)# ip dhcp pool ADMIN_POOL
-R1(dhcp-config)# default-router 192.168.10.1
-```
-
-### Проблем 3: Адресите са изчерпани
-
-**Проверка:**
-```cisco
+! Има ли DHCP pool за този subnet?
 R1# show ip dhcp pool
 
-Pool ADMIN_POOL :
- Total addresses                : 244
- Leased addresses               : 244    ← ПРОБЛЕМ!
+! Интерфейсът UP ли е?
+R1# show ip interface brief
+
+! Правилен ли е VLAN на порта?
+SW1# show vlan brief
 ```
 
 **Решение:**
+1. Проверете DHCP pool конфигурацията
+2. Проверете VLAN assignment на switch port-а
+3. Release и renew отново
+
+### Проблем 2: PC получава 169.254.x.x
+
+**Какво значи?**
+- Windows автоматично раздава **APIPA адрес**
+- Появява се когато DHCP server **НЕ е достъпен**
+
+**Решение:**
+1. Проверете дали DHCP service е ON (ако ползвате Server)
+2. Проверете физическата свързаност
+3. Проверете ip helper-address (ако Server е в друг VLAN)
+
+### Проблем 3: Грешен gateway
+
+**Симптоми:**
+- PC получава адрес
+- Ping в същия VLAN работи
+- Ping извън VLAN-а НЕ работи
+
+**Решение:**
 ```cisco
-R1(config)# ip dhcp excluded-address 192.168.10.1 192.168.10.5
-! Намалихме excluded range
+! Проверка на pool
+R1# show running-config | section dhcp
+
+! Трябва да видите:
+ip dhcp pool ADMIN_POOL
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.1   ← Проверете!
 ```
 
 ---
 
-## ЧАСТ 8: Статична резервация (DHCP Reservation)
+## ЧАСТ 8: Статична резервация за Server (BONUS - 10 мин)
 
-### Scenario: 
-Искате принтер винаги да получава 192.168.10.50
+### Scenario:
+Искаме File Server винаги да получава **192.168.10.50**
 
-### Стъпка 1: Намерете MAC адреса на устройството
-```
-На PC свързан към принтера:
-arp -a
-```
+**Защо File Server, не Web Server?**
+- Web Server обикновено е на **.3** (ще го добавим в Lab 4)
+- File Server е по-подходящ за **.50** (сървърна зона)
 
-### Стъпка 2: Създайте ръчен binding
+### Стъпка 1: Добавете File Server
+
+1. **Добавете Server-PT** в VLAN 10
+2. Име: File Server
+3. Свържете към **SW1 Fa0/6**
+
 ```cisco
-R1(config)# ip dhcp pool PRINTER
+SW1(config)# interface FastEthernet0/6
+SW1(config-if)# switchport mode access  
+SW1(config-if)# switchport access vlan 10
+SW1(config-if)# description File-Server
+SW1(config-if)# exit
+```
+
+### Стъпка 2: Намерете MAC адреса
+
+**От Router:**
+```cisco
+R1# show ip dhcp binding
+
+IP address       Hardware address
+192.168.10.13    00D0.974B.97FC    ← Това е File Server
+```
+
+### Стъпка 3: Excluded address
+
+```cisco
+R1(config)# ip dhcp excluded-address 192.168.10.50
+```
+
+**Защо?** За да не го раздава pool-ът на друго устройство.
+
+### Стъпка 4: Manual binding
+
+```cisco
+R1(config)# ip dhcp pool FILE_SERVER
 R1(dhcp-config)# host 192.168.10.50 255.255.255.0
-R1(dhcp-config)# client-identifier 01aa.bbcc.ddee.ff
+R1(dhcp-config)# client-identifier 0100.d097.4b97.fc
 R1(dhcp-config)# default-router 192.168.10.1
 R1(dhcp-config)# exit
 ```
 
-**Алтернатива с hardware-address:**
-```cisco
-R1(config)# ip dhcp pool PRINTER
-R1(dhcp-config)# host 192.168.10.50 255.255.255.0
-R1(dhcp-config)# hardware-address aabb.ccdd.eeff
+**Забележка:** Client-identifier = "01" + MAC адрес
+
+**⚠️ ВАЖНО:** В Packet Tracer използвайте **client-identifier** (НЕ hardware-address)!
+
+### Стъпка 5: DHCP на Server
+
+**File Server → Desktop → IP Configuration**
+- Изберете **DHCP**
+- Кликнете бутона
+
+**Трябва да получи:**
 ```
+IP Address: 192.168.10.50
+```
+
+**Забележка:** Web Server ще добавим в **Lab 4** на адрес **192.168.10.3**
 
 ---
 
-## ЧАСТ 9: DHCP Snooping (Security - BONUS)
+## СРАВНЕНИЕ: Router vs Server метод
 
-### Защита срещу Rogue DHCP Servers:
+| Аспект | Router DHCP | Server DHCP |
+|--------|-------------|-------------|
+| **Конфигурация** | CLI команди | GUI (по-лесно) |
+| **Lease Time** | ❌ Не работи в PT | ✅ Работи! |
+| **Flexibility** | По-гъвкав | Основни настройки |
+| **За бакалаври** | Трябва да знаят IOS | По-достъпно |
+| **Реален свят** | Често се използва | При малки мрежи |
+| **За Lab** | Основен метод | BONUS |
 
-```cisco
-SW1(config)# ip dhcp snooping
-SW1(config)# ip dhcp snooping vlan 10,20
-!
-SW1(config)# interface FastEthernet0/1
-SW1(config-if)# description Trusted - to Router
-SW1(config-if)# ip dhcp snooping trust
-SW1(config-if)# exit
-!
-! Всички останали портове са untrusted по default
-```
-
-**Какво прави:**
-- Блокира DHCP OFFER пакети от untrusted портове
-- Позволява само от trusted (към легитимния DHCP сървър)
+**Препоръка:** Научете и двата метода!
 
 ---
 
 ## ЗАДАЧИ ЗА САМОСТОЯТЕЛНА РАБОТА
 
-### Задача 1: Добавете трети DHCP pool
-- Създайте VLAN 30 - Guest (192.168.30.0/24)
-- Конфигурирайте DHCP pool с lease 1 ден
-- Exclude първите 20 адреса
+### Задача 1: Трети VLAN
+- Създайте VLAN 30 (Guest: 192.168.30.0/24)
+- Добавете DHCP pool
 - Тествайте с нов PC
 
-### Задача 2: Променете DNS сървърите
-- Използвайте Cloudflare DNS: 1.1.1.1 и 1.0.0.1
-- Обновете и двата pool-а
-- Release и renew на всички PC-та
+### Задача 2: Променете DNS
+- Използвайте Cloudflare DNS: **1.1.1.1**
+- Обновете pools
+- Release/renew на PC-тата
 
-### Задача 3: Намалете lease time
-- Променете lease на 2 часа за Guest VLAN
-- Защо е полезно за guest мрежа?
-
-### Задача 4: DHCP Options
-Добавете допълнителни опции:
-```cisco
-R1(dhcp-config)# option 42 ip 192.168.10.5   ! NTP server
-R1(dhcp-config)# option 150 ip 192.168.10.6  ! TFTP server
-```
-
----
-
-## ЧЕСТО СРЕЩАНИ ПРОБЛЕМИ
-
-### Проблем: "DHCP Request Failed"
-**Причини:**
-- Няма DHCP pool за този subnet
-- Всички адреси са заети
-- Interface на router е down
-
-**Решение:**
-```cisco
-R1# show ip dhcp pool
-R1# show ip interface brief
-```
-
-### Проблем: Получава адрес от грешен pool
-**Причина:** PC е на грешен VLAN
-**Решение:**
-```cisco
-SW1# show vlan brief
-SW1# show mac address-table
-```
-
-### Проблем: Lease не се обновява
-**Причина:** Router clock не е настроен
-**Решение:**
-```cisco
-R1# clock set 14:30:00 15 June 2024
-```
-
----
-
-## ДОКУМЕНТАЦИЯ ЗА ПРОЕКТА
-
-### Таблица с DHCP Pools:
-
-| Pool Name   | VLAN | Network          | Gateway       | DNS           | Lease | Excluded Range      |
-|-------------|------|------------------|---------------|---------------|-------|---------------------|
-| ADMIN_POOL  | 10   | 192.168.10.0/24  | 192.168.10.1  | 8.8.8.8       | 7 d   | .1-.10              |
-| IT_POOL     | 20   | 192.168.20.0/24  | 192.168.20.1  | 8.8.8.8       | 7 d   | .1-.10              |
-| GUEST_POOL  | 30   | 192.168.30.0/24  | 192.168.30.1  | 1.1.1.1       | 1 d   | .1-.20              |
-
-### Команди за верификация:
-```cisco
-show ip dhcp binding
-show ip dhcp pool
-show ip dhcp server statistics
-show ip dhcp conflict
-```
+### Задача 3: Server DHCP
+- Пробвайте Server метода (ЧАСТ 4)
+- Настройте lease time на 2 дни
+- Сравнете с Router метода
 
 ---
 
 ## CHECKLIST ЗА ЗАВЪРШВАНЕ
 
 ```
-☐ DHCP pool създаден за всеки VLAN
+☐ DHCP pools създадени (VLAN 10 и 20)
 ☐ Excluded addresses конфигурирани
-☐ Default gateway правилно зададен
-☐ DNS servers добавени
-☐ Lease time определен
 ☐ PC-тата получават адреси автоматично
-☐ Ping работи между всички устройства
-☐ Show ip dhcp binding показва всички клиенти
-☐ Документирани са всички pools
-☐ Конфигурацията е запазена
+☐ Ping работи между всички VLAN-и
+☐ show ip dhcp binding показва клиентите
+☐ (BONUS) Server DHCP тестван
+☐ (BONUS) Manual binding за File Server
+☐ Конфигурацията е запазена (copy run start)
 ```
 
 ---
 
 ## КАКВО НАУЧИХМЕ
 
-1. ✅ DHCP концепция и DORA процес
-2. ✅ Конфигурация на DHCP pools на Router
-3. ✅ Excluded addresses
-4. ✅ DHCP options (gateway, DNS, lease time)
-5. ✅ DHCP binding и статистики
-6. ✅ Troubleshooting с debug команди
-7. ✅ DHCP Relay Agent (ip helper-address)
-8. ✅ DHCP Snooping за сигурност
+1. ✅ Какво е DHCP и защо е важен
+2. ✅ DORA процес (Discover, Offer, Request, ACK)
+3. ✅ Конфигурация на DHCP на Router
+4. ✅ Excluded addresses
+5. ✅ (BONUS) Server като DHCP с lease time
+6. ✅ (BONUS) Manual binding за сървъри
+7. ✅ Troubleshooting
 
 ---
 
@@ -451,10 +494,16 @@ show ip dhcp conflict
 
 В **Lab 4** ще научим:
 - DNS конфигурация
-- Как да създадем локален DNS сървър
-- Name resolution в мрежата
+- Name resolution (ping по име вместо IP)
+- Интеграция на DHCP със DNS
 
 **Запазете файла като:** `Lab3_DHCP_YourName.pkt`
+
+---
+
+**гл. ас. Светослав Атанасов**  
+svetoslav.atanasov@trakia-uni.bg
+
 
 <script data-goatcounter="https://satanasov.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>

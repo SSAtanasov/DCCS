@@ -1218,6 +1218,11 @@ tracert 8.8.8.8                   # Trace route to Internet
 **Версия:** 2.0 (с ISP Router и коригиран VLAN 50)
 
 
+
+**гл. ас. Светослав Атанасов**  
+svetoslav.atanasov@trakia-uni.bg
+
+
 <script data-goatcounter="https://satanasov.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 

@@ -1,10 +1,19 @@
-# LAB 7: Йерархична топология с Layer 3 routing
+# LAB 7: Йерархична топология с Layer 3 routing (ОБНОВЕН)
 
 **Продължителност:** 120-150 минути  
 **Цел:** Изграждане на правилна йерархична мрежа (Access/Distribution/Core) с Layer 3 routing, QoS и redundancy
-**Prerequisite:** Завършени Lab 1-6 (особено Lab 2 за VLAN, Lab 5 за ACL)
+
 ---
-> **ВАЖНО:** Този лаб използва **нова топология**, различна от Lab 1-6. Целта е да демонстрира enterprise-grade йерархичен дизайн (Core/Distribution/Access) с multilayer switches. Концепциите от предишните лабове (VLAN, ACL, DHCP) се прилагат в по-мащабна среда.
+
+## КРИТИЧНИ ПРОМЕНИ СПРЯМО ОРИГИНАЛНАТА ВЕРСИЯ
+
+### Основни подобрения:
+1. ✅ **Layer 3 switches** на Core и Distribution слоевете
+2. ✅ **Inter-VLAN routing** - PC-та в различни VLAN могат да комуникират
+3. ✅ **HSRP redundancy** между Distribution switches
+4. ✅ **Redundant links** между Core и Distribution
+5. ✅ **QoS policies** на Distribution Layer
+6. ✅ **Spanning Tree оптимизация**
 
 ---
 
@@ -21,6 +30,21 @@
 ---
 
 ## ТЕОРЕТИЧНА ОСНОВА
+
+### Какво е различно от предишната версия?
+
+**ПРЕДИ (Lab 7 v1):**
+- Само Layer 2 switches (2960-24TT)
+- Няма routing между VLAN-и
+- Няма redundancy
+- Няма QoS
+
+**СЕГА (Lab 7 v2):**
+- Core и Distribution са **Layer 3 Multilayer Switches**
+- Пълна inter-VLAN routing функционалност
+- HSRP за gateway redundancy
+- QoS на Distribution Layer
+- Spanning Tree оптимизация
 
 ### Йерархичен модел - правилна имплементация
 
@@ -662,6 +686,50 @@ show standby brief
 ☐ SVI конфигурирани за всички VLAN-и
 ☐ PC в различни VLAN могат да ping-ват
 ☐ Routing table показва connected routes
+☐ Traceroute показва правилния път
+```
+
+### HSRP Redundancy:
+```
+☐ HSRP virtual IP конфигуриран за всеки VLAN
+☐ Dist-SW1 е Active (priority 110)
+☐ Dist-SW2 е Standby (priority 100)
+☐ При отказ на Active - Standby поема ролята
+☐ Preempt enabled - възстановяване при връщане
+```
+
+### Spanning Tree:
+```
+☐ Core-SW е Root Bridge (priority 4096)
+☐ Redundant links са blocked от STP
+☐ При отказ на линк - автоматично unblock
+☐ Convergence време < 50 секунди (RSTP)
+```
+
+### QoS:
+```
+☐ `mls qos` enabled на Distribution switches
+☐ Trunk портове trust DSCP
+☐ (Optional) Class maps и policy maps конфигурирани
+```
+
+---
+
+## РАЗЛИКИ СПРЯМО ОРИГИНАЛНАТА ВЕРСИЯ
+
+| Аспект | Оригинална версия | Обновена версия |
+|--------|-------------------|-----------------|
+| **Оборудване Core** | 2960 L2 | **3650 L3** |
+| **Оборудване Distribution** | 2960 L2 | **3650 L3** |
+| **Routing** | ✗ Няма | ✅ Inter-VLAN routing |
+| **Gateway** | ✗ Не работи | ✅ HSRP Virtual IP |
+| **Redundancy** | ✗ Липсва | ✅ Redundant links + HSRP |
+| **QoS** | ✗ Липсва | ✅ Enabled на Distribution |
+| **Spanning Tree** | Default | ✅ Оптимизиран (Root на Core) |
+| **PC connectivity** | Само в един VLAN | **Между всички VLAN** |
+
+---
+
 ## ЧЕСТО СРЕЩАНИ ПРОБЛЕМИ
 
 ### Проблем 1: PC не могат да ping между VLAN-и
@@ -798,10 +866,10 @@ interface vlan 10
 
 ---
 
-**гл. ас. Светослав Атанасов**  
-Проектиране на комуникационни и компютърни системи  
-Тракийски университет
+---
 
+**гл. ас. Светослав Атанасов**  
+svetoslav.atanasov@trakia-uni.bg
 
 
 <script data-goatcounter="https://satanasov.goatcounter.com/count"
