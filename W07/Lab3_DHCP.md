@@ -5,7 +5,7 @@
 
 **Продължителност:** 60 минути
 
-**Prerequisite:** Завършен Lab 2 (VLAN-и и Inter-VLAN routing)
+**Предварителни изисквания:** Завършен Lab 2 (VLAN-и и Inter-VLAN routing)
 
 ---
 
