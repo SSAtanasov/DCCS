@@ -1,19 +1,12 @@
-# LAB 7: Йерархична топология с Layer 3 routing (ОБНОВЕН)
+# LAB 7: Management VLAN, йерархична топология и Layer 3 switching
 
-**Продължителност:** 120-150 минути  
-**Цел:** Изграждане на правилна йерархична мрежа (Access/Distribution/Core) с Layer 3 routing, QoS и redundancy
+**Продължителност:** 120-150 минути (Стъпки 1-6) + около 30 минути (Стъпка 7 – отказоустойчивост)
+**Цел:** Изграждане на йерархична мрежа (Access/Distribution/Core) с Layer 3 комутатори, управление през Management VLAN 99 и SSH, HSRP и резервирани връзки
+**Prerequisite:** Lab 2 (VLAN, trunk, Част 3А – два комутатора) и Lab 5 (SSH)
 
----
+> **Надграждащо упражнение:** Lab 7–9 не са задължителни за курсовия проект; основата за проекта са Lab 1–6. Lab 7 няма рутер и използва 5 VLAN-а – в курсовия проект важат ограниченията на заданието (1 Router, 2–4 VLAN-а).
 
-## КРИТИЧНИ ПРОМЕНИ СПРЯМО ОРИГИНАЛНАТА ВЕРСИЯ
-
-### Основни подобрения:
-1. ✅ **Layer 3 switches** на Core и Distribution слоевете
-2. ✅ **Inter-VLAN routing** - PC-та в различни VLAN могат да комуникират
-3. ✅ **HSRP redundancy** между Distribution switches
-4. ✅ **Redundant links** между Core и Distribution
-5. ✅ **QoS policies** на Distribution Layer
-6. ✅ **Spanning Tree оптимизация**
+Упражнението се изпълнява в **нов празен файл**.
 
 ---
 
@@ -23,28 +16,13 @@
 - ✅ Създавате правилна йерархична топология с L3 routing
 - ✅ Конфигурирате inter-VLAN routing с SVI (Switch Virtual Interface)
 - ✅ Прилагате HSRP за gateway redundancy
-- ✅ Настройвате QoS policies на Distribution Layer
+- ✅ Управлявате комутаторите през Management VLAN 99 и SSH
 - ✅ Изграждате redundant links с Spanning Tree Protocol
 - ✅ Тествате fault tolerance при отказ на връзка
 
 ---
 
 ## ТЕОРЕТИЧНА ОСНОВА
-
-### Какво е различно от предишната версия?
-
-**ПРЕДИ (Lab 7 v1):**
-- Само Layer 2 switches (2960-24TT)
-- Няма routing между VLAN-и
-- Няма redundancy
-- Няма QoS
-
-**СЕГА (Lab 7 v2):**
-- Core и Distribution са **Layer 3 Multilayer Switches**
-- Пълна inter-VLAN routing функционалност
-- HSRP за gateway redundancy
-- QoS на Distribution Layer
-- Spanning Tree оптимизация
 
 ### Йерархичен модел - правилна имплементация
 
@@ -86,70 +64,76 @@
 ### Целева топология:
 
 ```
-                    [Core-SW]
-              (Multilayer Switch 3650)
-                  10.99.99.10/24
-                  Root Bridge
-         ┌────────────┴────────────┐
-         │ (Gi0/1,Gi0/2)    (Gi0/3,Gi0/4) │
-         │  Redundant      Redundant   │
-    [Dist-SW1 L3]              [Dist-SW2 L3]
-(Multilayer Switch 3650)  (Multilayer Switch 3650)
-   10.99.99.11/24            10.99.99.12/24
-   HSRP Virtual IPs:
-   - VLAN 10: 192.168.10.1
-   - VLAN 20: 192.168.20.1
-   - VLAN 30: 192.168.30.1
-   - VLAN 40: 192.168.40.1
-         │                        │
-    ┌────┴──────┐          ┌──────┴──────┐
-    │           │          │             │
-[Access-SW1] [Access-SW2] [Access-SW3] [Access-SW4]
-  (2960)      (2960)       (2960)        (2960)
-10.99.99.21  10.99.99.22  10.99.99.23   10.99.99.24
-    │           │            │             │
-  VLAN 10    VLAN 20      VLAN 30       VLAN 40
-  Sales      Engineer      HR            IT
-    │           │            │             │
-  PC1-PC2    PC3-PC4      PC5-PC6       PC7-PC8
+                              [Core-SW]
+                       (Multilayer Switch 3650)
+                     10.99.99.10/24 - Root Bridge
+                  Gi1/0/1-2 /                \ Gi1/0/3-4
+                 (2 връзки)/                  \(2 връзки)
+                          /                    \
+             [Dist-SW1 L3]                      [Dist-SW2 L3]
+             10.99.99.11                        10.99.99.12
+             HSRP Active (110)                  HSRP Standby (100)
+             Gi1/0/21-24                        Gi1/0/21-24
+                  |                                  |
+                  +-> Gi0/1 на Access-SW1...SW4      +-> Gi0/2 на Access-SW1...SW4
+
+  HSRP виртуални gateway-и: 192.168.10.1, 192.168.20.1, 192.168.30.1,
+                            192.168.40.1 и 10.99.99.1 (Management)
+
+  [Access-SW1]     [Access-SW2]     [Access-SW3]     [Access-SW4]
+    (2960)           (2960)           (2960)           (2960)
+  10.99.99.21      10.99.99.22      10.99.99.23      10.99.99.24
+       |                |                |                |
+    VLAN 10          VLAN 20          VLAN 30          VLAN 40
+     Sales         Engineering          HR               IT
+    PC1-PC2          PC3-PC4          PC5-PC6          PC7-PC8
 ```
+
+Всеки Access комутатор има **две** uplink връзки: Gi0/1 към Dist-SW1 и Gi0/2 към Dist-SW2.
 
 **VLAN дизайн:**
 - VLAN 10: Sales (192.168.10.0/24) - Gateway: .1 (HSRP)
 - VLAN 20: Engineering (192.168.20.0/24) - Gateway: .1 (HSRP)
 - VLAN 30: HR (192.168.30.0/24) - Gateway: .1 (HSRP)
 - VLAN 40: IT (192.168.40.0/24) - Gateway: .1 (HSRP)
-- **VLAN 99: Management** (10.99.99.0/24) - Gateway: Core-SW
+- **VLAN 99: Management** (10.99.99.0/24) - Gateway: 10.99.99.1 (HSRP на Dist-SW1/Dist-SW2)
 
 ---
 
 ## СТЪПКА 1: Изграждане на топологията
 
-### 1.1 Добави устройства
+### 1.1 Добавете устройства
 
-В Packet Tracer добави:
-- **1x Multilayer Switch 3650-24PS** (Core-SW)
-- **2x Multilayer Switch 3650-24PS** (Dist-SW1, Dist-SW2)
+В Packet Tracer добавете:
+- **3x Multilayer Switch 3650-24PS** (Core-SW, Dist-SW1, Dist-SW2)
 - **4x 2960-24TT Switch** (Access-SW1 до Access-SW4)
 - **8x PC** (по 2 на всеки Access switch)
 
+**Захранване на 3650:** ако след добавянето портовете на 3650 са червени и CLI не отговаря, отворете **Physical**, плъзнете модула **AC-POWER-SUPPLY** в празния слот за захранване и включете устройството.
+
+**Имена на портовете на 3650:** GigabitEthernet**1/0/1** – **1/0/24** (обикновени портове) и Gi1/1/1 – 1/1/4 (SFP слотове, изискват модул). В упражнението използваме само Gi1/0/x. На 2960 портовете остават Fa0/1 – Fa0/24 и Gi0/1 – Gi0/2.
+
 ### 1.2 Кабелиране
 
-**Core към Distribution (REDUNDANT):**
+Между комутаторите използвайте кабел **Copper Cross-Over**, към PC – **Copper Straight-Through**.
+
+**Core към Distribution (по две паралелни връзки):**
 ```
-Core-SW Gi0/1 ↔ Dist-SW1 Gi0/1
-Core-SW Gi0/2 ↔ Dist-SW1 Gi0/2  (Redundant link)
-Core-SW Gi0/3 ↔ Dist-SW2 Gi0/1
-Core-SW Gi0/4 ↔ Dist-SW2 Gi0/2  (Redundant link)
+Core-SW Gi1/0/1 ↔ Dist-SW1 Gi1/0/1
+Core-SW Gi1/0/2 ↔ Dist-SW1 Gi1/0/2  (Redundant link)
+Core-SW Gi1/0/3 ↔ Dist-SW2 Gi1/0/1
+Core-SW Gi1/0/4 ↔ Dist-SW2 Gi1/0/2  (Redundant link)
 ```
 
-**Distribution към Access:**
+**Distribution към Access (всеки Access комутатор към двата Distribution):**
 ```
-Dist-SW1 Fa0/23 ↔ Access-SW1 Gi0/1
-Dist-SW1 Fa0/24 ↔ Access-SW2 Gi0/1
-Dist-SW2 Fa0/23 ↔ Access-SW3 Gi0/1
-Dist-SW2 Fa0/24 ↔ Access-SW4 Gi0/1
+Dist-SW1 Gi1/0/21 ↔ Access-SW1 Gi0/1     Dist-SW2 Gi1/0/21 ↔ Access-SW1 Gi0/2
+Dist-SW1 Gi1/0/22 ↔ Access-SW2 Gi0/1     Dist-SW2 Gi1/0/22 ↔ Access-SW2 Gi0/2
+Dist-SW1 Gi1/0/23 ↔ Access-SW3 Gi0/1     Dist-SW2 Gi1/0/23 ↔ Access-SW3 Gi0/2
+Dist-SW1 Gi1/0/24 ↔ Access-SW4 Gi0/1     Dist-SW2 Gi1/0/24 ↔ Access-SW4 Gi0/2
 ```
+
+**Защо две uplink връзки?** HSRP премества gateway-я на Dist-SW2 при отказ на Dist-SW1, но това помага само ако крайните устройства имат физически път до Dist-SW2. STP блокира едната връзка, докато другата работи.
 
 **Access към PC:**
 ```
@@ -184,7 +168,7 @@ line console 0
 ! КРИТИЧНО: Enable IP routing!
 ip routing
 
-! VLAN-и (само за awareness, routing става със SVI)
+! VLAN-и (нужни, за да ги пренасят trunk-овете и STP)
 vlan 10
  name Sales
 vlan 20
@@ -204,29 +188,32 @@ interface vlan 99
  no shutdown
  exit
 
-! Spanning Tree - Root Bridge за всички VLAN-и
+! Маршрут към потребителските VLAN-и през HSRP gateway-я на VLAN 99
+ip route 0.0.0.0 0.0.0.0 10.99.99.1
+
+! Spanning Tree - Rapid PVST+, Core е Root Bridge
 spanning-tree mode rapid-pvst
-spanning-tree vlan 1-4094 priority 4096
+spanning-tree vlan 10,20,30,40,99 priority 4096
 
 ! Trunk портове към Distribution switches
-interface range gigabitEthernet 0/1-4
+interface range GigabitEthernet1/0/1 - 4
  description Trunk-to-Distribution
- switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 99
  switchport trunk allowed vlan 10,20,30,40,99
  no shutdown
  exit
 
-! Запази конфигурацията
+! Запазване на конфигурацията
 end
 copy running-config startup-config
 ```
 
 **Важни бележки:**
 - `ip routing` - КРИТИЧНО за L3 functionality
-- `spanning-tree priority 4096` - Core става Root Bridge
-- `switchport trunk encapsulation dot1q` - нужно за multilayer switches
+- `spanning-tree vlan ... priority 4096` - Core става Root Bridge
+- На комутатор с `ip routing` командата `ip default-gateway` не се използва – затова Core получава маршрут по подразбиране към 10.99.99.1
+- На 3650 няма команда `switchport trunk encapsulation` (поддържа се само 802.1Q). На по-старите 3560 тя е задължителна преди `switchport mode trunk`
 
 ---
 
@@ -250,7 +237,7 @@ line console 0
 ! КРИТИЧНО: Enable IP routing!
 ip routing
 
-! Създай VLAN-и
+! VLAN-и
 vlan 10
  name Sales
 vlan 20
@@ -263,10 +250,19 @@ vlan 99
  name Management
  exit
 
-! SVI за Management
+! STP: Rapid PVST+; Dist-SW1 е резервен Root след Core
+spanning-tree mode rapid-pvst
+spanning-tree vlan 10,20,30,40,99 priority 8192
+
+! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+! MANAGEMENT VLAN 99 + HSRP (gateway за комутаторите)
+! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 interface vlan 99
- description Management-Interface
+ description Management-Gateway
  ip address 10.99.99.11 255.255.255.0
+ standby 99 ip 10.99.99.1
+ standby 99 priority 110
+ standby 99 preempt
  no shutdown
  exit
 
@@ -314,40 +310,22 @@ interface vlan 40
  no shutdown
  exit
 
-! Trunk към Core (redundant)
-interface range gigabitEthernet 0/1-2
+! Trunk към Core (две паралелни връзки)
+interface range GigabitEthernet1/0/1 - 2
  description Trunk-to-Core
- switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 99
  switchport trunk allowed vlan 10,20,30,40,99
  no shutdown
  exit
 
-! Trunk към Access switches
-interface range fastEthernet 0/23-24
+! Trunk към четирите Access switches
+interface range GigabitEthernet1/0/21 - 24
  description Trunk-to-Access
- switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 99
  switchport trunk allowed vlan 10,20,30,40,99
  no shutdown
- exit
-
-! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-! QoS CONFIGURATION (критично за Distribution Layer!)
-! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-! Enable QoS globally
-mls qos
-
-! Trust DSCP on trunk ports
-interface range gigabitEthernet 0/1-2
- mls qos trust dscp
- exit
-
-interface range fastEthernet 0/23-24
- mls qos trust dscp
  exit
 
 end
@@ -372,7 +350,7 @@ line console 0
 ! КРИТИЧНО: Enable IP routing!
 ip routing
 
-! Създай VLAN-и
+! VLAN-и
 vlan 10
  name Sales
 vlan 20
@@ -385,10 +363,19 @@ vlan 99
  name Management
  exit
 
-! SVI за Management
+! STP: Rapid PVST+; Dist-SW2 е след Core и Dist-SW1
+spanning-tree mode rapid-pvst
+spanning-tree vlan 10,20,30,40,99 priority 16384
+
+! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+! MANAGEMENT VLAN 99 + HSRP (gateway за комутаторите)
+! ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 interface vlan 99
- description Management-Interface
+ description Management-Gateway
  ip address 10.99.99.12 255.255.255.0
+ standby 99 ip 10.99.99.1
+ standby 99 priority 100
+ standby 99 preempt
  no shutdown
  exit
 
@@ -437,40 +424,31 @@ interface vlan 40
  no shutdown
  exit
 
-! Trunk към Core (redundant)
-interface range gigabitEthernet 0/1-2
+! Trunk към Core (две паралелни връзки)
+interface range GigabitEthernet1/0/1 - 2
  description Trunk-to-Core
- switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 99
  switchport trunk allowed vlan 10,20,30,40,99
  no shutdown
  exit
 
-! Trunk към Access switches
-interface range fastEthernet 0/23-24
+! Trunk към четирите Access switches
+interface range GigabitEthernet1/0/21 - 24
  description Trunk-to-Access
- switchport trunk encapsulation dot1q
  switchport mode trunk
  switchport trunk native vlan 99
  switchport trunk allowed vlan 10,20,30,40,99
  no shutdown
- exit
-
-! QoS enable
-mls qos
-
-interface range gigabitEthernet 0/1-2
- mls qos trust dscp
- exit
-
-interface range fastEthernet 0/23-24
- mls qos trust dscp
  exit
 
 end
 copy running-config startup-config
 ```
+
+**Защо STP priority 8192 на Dist-SW1?** Така всеки Access комутатор избира за Root port връзката към Dist-SW1 (HSRP Active), а връзката към Dist-SW2 остава резервна (Alternate, BLK).
+
+**QoS:** В основната част QoS не се конфигурира. Вижте Задача 3 (теоретична).
 
 ---
 
@@ -491,12 +469,14 @@ line console 0
  logging synchronous
  exit
 
-! Създай VLAN-и
+! VLAN-и
 vlan 10
  name Sales
 vlan 99
  name Management
  exit
+
+spanning-tree mode rapid-pvst
 
 ! Management IP
 interface vlan 99
@@ -504,12 +484,12 @@ interface vlan 99
  no shutdown
  exit
 
-! Default gateway (към Core)
-ip default-gateway 10.99.99.10
+! Default gateway (HSRP виртуален адрес на VLAN 99)
+ip default-gateway 10.99.99.1
 
-! Trunk към Distribution
-interface gigabitEthernet 0/1
- description Trunk-to-Dist-SW1
+! Uplinks: Gi0/1 към Dist-SW1, Gi0/2 към Dist-SW2
+interface range gigabitEthernet 0/1 - 2
+ description Trunk-to-Distribution
  switchport mode trunk
  switchport trunk native vlan 99
  switchport trunk allowed vlan 10,99
@@ -517,7 +497,7 @@ interface gigabitEthernet 0/1
  exit
 
 ! Access портове за PC-та
-interface range fastEthernet 0/1-2
+interface range fastEthernet 0/1 - 2
  description Access-Ports-VLAN10
  switchport mode access
  switchport access vlan 10
@@ -526,8 +506,8 @@ interface range fastEthernet 0/1-2
  no shutdown
  exit
 
-! Изключи неизползваните портове
-interface range fastEthernet 0/3-24
+! Изключване на неизползваните портове
+interface range fastEthernet 0/3 - 24
  shutdown
  exit
 
@@ -535,36 +515,58 @@ end
 copy running-config startup-config
 ```
 
+**Бележка:** Allowed списъкът на Distribution е по-широк (10,20,30,40,99). По trunk-а минават само VLAN-ите, разрешени и от двете страни, затова към Access-SW1 отиват само VLAN 10 и 99.
+
 ### 4.2 Access-SW2, SW3, SW4
 
 **Access-SW2 (VLAN 20):**
 - `hostname Access-SW2`
 - Management IP: `10.99.99.22`
 - VLAN 20 вместо 10
-- Trunk allowed: `vlan 20,99`
+- Trunk allowed (Gi0/1 и Gi0/2): `vlan 20,99`
 - Access ports: `switchport access vlan 20`
 
 **Access-SW3 (VLAN 30):**
 - `hostname Access-SW3`
 - Management IP: `10.99.99.23`
 - VLAN 30
-- Trunk allowed: `vlan 30,99`
-- Trunk от Dist-SW2
+- Trunk allowed (Gi0/1 и Gi0/2): `vlan 30,99`
 - Access ports: `switchport access vlan 30`
 
 **Access-SW4 (VLAN 40):**
 - `hostname Access-SW4`
 - Management IP: `10.99.99.24`
 - VLAN 40
-- Trunk allowed: `vlan 40,99`
-- Trunk от Dist-SW2
+- Trunk allowed (Gi0/1 и Gi0/2): `vlan 40,99`
 - Access ports: `switchport access vlan 40`
+
+### 4.3 SSH на всички комутатори
+
+Изпълнете на **всичките 7 комутатора** (Core-SW, Dist-SW1, Dist-SW2, Access-SW1 – SW4):
+
+```cisco
+ip domain-name company.local
+crypto key generate rsa
+How many bits in the modulus [512]: 1024
+ip ssh version 2
+username admin secret cisco123
+line vty 0 15
+ transport input ssh
+ login local
+ exit
+end
+copy running-config startup-config
+```
+
+**Предпоставка:** адрес във VLAN 99 и gateway (Стъпки 2-4). Тестът е в Стъпка 6.5.
+
+**Пароли:** `class123` и `cisco123` са само примерни. В курсовия проект слабите пароли са забранени.
 
 ---
 
 ## СТЪПКА 5: Конфигуриране на PC-тата
 
-**Конфигурирай PC-тата статично (gateway е HSRP Virtual IP!):**
+**Конфигурирайте PC-тата статично (gateway е HSRP Virtual IP!):**
 
 | PC | VLAN | IP Address | Subnet Mask | **Gateway (HSRP)** |
 |----|------|------------|-------------|-------------------|
@@ -581,17 +583,27 @@ copy running-config startup-config
 
 ## СТЪПКА 6: Тестване на Layer 3 routing
 
-### 6.1 Провери routing tables
+### 6.1 Проверка на routing tables
 
 От Dist-SW1:
 ```cisco
 show ip route
 
-! Очакван резултат:
+! Очакван резултат (плюс редове L за собствените адреси):
+! C 10.99.99.0/24 is directly connected, Vlan99
 ! C 192.168.10.0/24 is directly connected, Vlan10
 ! C 192.168.20.0/24 is directly connected, Vlan20
 ! C 192.168.30.0/24 is directly connected, Vlan30
 ! C 192.168.40.0/24 is directly connected, Vlan40
+```
+
+От Core-SW:
+```cisco
+show ip route
+
+! Очакван резултат:
+! S* 0.0.0.0/0 [1/0] via 10.99.99.1
+! C 10.99.99.0/24 is directly connected, Vlan99
 ```
 
 ### 6.2 Тест на inter-VLAN routing
@@ -608,73 +620,116 @@ C:\> ping 192.168.20.10
 C:\> tracert 192.168.30.10
 
 ! Очакван резултат:
-! 1  192.168.10.1 (gateway - HSRP)
-! 2  192.168.30.10 (destination)
+! 1  192.168.10.2   (активният Dist-SW1; някои версии показват виртуалния 192.168.10.1)
+! 2  192.168.30.10  (destination)
 ```
 
-### 6.3 Провери HSRP status
+### 6.3 Проверка на HSRP status
 
 От Dist-SW1:
 ```cisco
 show standby brief
 
-! Очакван резултат:
-! Vlan10  10  P   192.168.10.1    Active   local
-! Vlan20  20  P   192.168.20.1    Active   local
+! Очакван резултат (съкратен):
+! Interface   Grp  Pri P State    Active          Standby         Virtual IP
+! Vl10        10   110 P Active   local           192.168.10.3    192.168.10.1
+! Vl20        20   110 P Active   local           192.168.20.3    192.168.20.1
+! Vl99        99   110 P Active   local           10.99.99.12     10.99.99.1
 ```
 
 От Dist-SW2:
 ```cisco
 show standby brief
 
-! Очакван резултат:
-! Vlan10  10  P   192.168.10.1    Standby  192.168.10.2
-! Vlan20  20  P   192.168.20.1    Standby  192.168.20.2
+! Очакван резултат (съкратен):
+! Vl10        10   100 P Standby  192.168.10.2    local           192.168.10.1
+! Vl20        20   100 P Standby  192.168.20.2    local           192.168.20.1
 ```
 
-### 6.4 Провери Spanning Tree
+### 6.4 Проверка на Spanning Tree
 
 От Core-SW:
 ```cisco
 show spanning-tree summary
 
-! Виж че Core-SW е Root за всички VLAN-и
+! Core-SW е Root за всички VLAN-и
 ```
+
+От Access-SW1:
+```cisco
+show spanning-tree vlan 10
+
+! Gi0/1 (към Dist-SW1): Root FWD
+! Gi0/2 (към Dist-SW2): Altn BLK  ← резервна връзка
+```
+
+### 6.5 Управление през SSH
+
+От PC1:
+```
+C:\> ssh -l admin 10.99.99.21
+C:\> ssh -l admin 10.99.99.10
+```
+
+**Очакван резултат:** вход в Access-SW1 и в Core-SW. Ако няма отговор, проверете HSRP група 99 (`show standby brief`), маршрута на Core (`show ip route`) и `ip default-gateway` на Access комутатора.
 
 ---
 
 ## СТЪПКА 7: Тестване на Redundancy
 
-### 7.1 Симулирай отказ на линк
+### 7.1 Отказ на връзка Core–Distribution
 
-**Тест 1: Disable trunk между Core и Dist-SW1**
 ```cisco
-! На Core-SW:
-interface gigabitEthernet 0/1
+! На Dist-SW1: коя връзка към Core е активна?
+show spanning-tree vlan 99
+! Единият от Gi1/0/1 и Gi1/0/2 е Root FWD, другият е Altn BLK
+
+! От PC1:
+C:\> ping 10.99.99.10
+
+! На Dist-SW1 изключете активната връзка (напр. Gi1/0/1):
+interface gigabitEthernet 1/0/1
  shutdown
  exit
 
-! От PC1 ping PC3:
-C:\> ping 192.168.20.10
+! От PC1 отново:
+C:\> ping 10.99.99.10
 
-! Трябва ДА РАБОТИ! (автоматично failover)
+! Трябва ДА РАБОТИ! Резервната връзка става Root port (RSTP, няколко секунди)
+
+! Възстановете връзката:
+interface gigabitEthernet 1/0/1
+ no shutdown
 ```
 
-**Тест 2: Disable primary Distribution switch**
+### 7.2 Отказ на целия Dist-SW1 (HSRP failover)
+
 ```cisco
+! От PC1:
+C:\> ping 192.168.30.10
+
 ! На Dist-SW1 (симулира пълен отказ):
 reload
 
-! От PC1:
-C:\> ping 192.168.20.10
+! Докато Dist-SW1 се рестартира, от PC1:
+C:\> ping 192.168.30.10
 
-! Трябва ДА РАБОТИ! (HSRP failover към Dist-SW2)
+! Първите заявки могат да изтекат, после ping-ът ТРЯБВА ДА РАБОТИ:
+! RSTP активира Gi0/2 на Access комутаторите, HSRP прави Dist-SW2 Active
 
-! Провери HSRP:
 ! На Dist-SW2:
 show standby brief
-! Сега Dist-SW2 трябва да е Active!
+! Dist-SW2 е Active за всички групи
+
+! На Access-SW1:
+show spanning-tree vlan 10
+! Gi0/2 (към Dist-SW2) вече е Root FWD
 ```
+
+**Бележки:**
+- `reload` пита за потвърждение (Enter). Ако рестартът е твърде кратък за теста, изключете Dist-SW1 от бутона за захранване в **Physical** и после го включете.
+- След връщането на Dist-SW1 `preempt` го прави отново Active.
+- Без втората uplink връзка (Gi0/2) PC1 би загубил връзка при отказ на Dist-SW1: HSRP не възстановява прекъснат физически път.
 
 ---
 
@@ -682,16 +737,23 @@ show standby brief
 
 ### Layer 3 Routing:
 ```
-☐ `ip routing` enabled на Core и Distribution
+☐ ip routing enabled на Core и Distribution
 ☐ SVI конфигурирани за всички VLAN-и
 ☐ PC в различни VLAN могат да ping-ват
 ☐ Routing table показва connected routes
+☐ Core има маршрут по подразбиране към 10.99.99.1
 ☐ Traceroute показва правилния път
+```
+
+### Management и SSH:
+```
+☐ Всички комутатори имат адрес във VLAN 99 и gateway 10.99.99.1
+☐ SSH работи към всички 7 комутатора; Telnet е изключен
 ```
 
 ### HSRP Redundancy:
 ```
-☐ HSRP virtual IP конфигуриран за всеки VLAN
+☐ HSRP virtual IP конфигуриран за всеки VLAN (включително VLAN 99)
 ☐ Dist-SW1 е Active (priority 110)
 ☐ Dist-SW2 е Standby (priority 100)
 ☐ При отказ на Active - Standby поема ролята
@@ -700,39 +762,23 @@ show standby brief
 
 ### Spanning Tree:
 ```
-☐ Core-SW е Root Bridge (priority 4096)
-☐ Redundant links са blocked от STP
+☐ rapid-pvst на всички комутатори
+☐ Core-SW е Root Bridge (priority 4096), Dist-SW1 е резервен (8192)
+☐ На всеки Access комутатор Gi0/1 е Root FWD, Gi0/2 е Altn BLK
 ☐ При отказ на линк - автоматично unblock
-☐ Convergence време < 50 секунди (RSTP)
+☐ Convergence: няколко секунди при RSTP (до 50 секунди при класически STP)
 ```
-
-### QoS:
-```
-☐ `mls qos` enabled на Distribution switches
-☐ Trunk портове trust DSCP
-☐ (Optional) Class maps и policy maps конфигурирани
-```
-
----
-
-## РАЗЛИКИ СПРЯМО ОРИГИНАЛНАТА ВЕРСИЯ
-
-| Аспект | Оригинална версия | Обновена версия |
-|--------|-------------------|-----------------|
-| **Оборудване Core** | 2960 L2 | **3650 L3** |
-| **Оборудване Distribution** | 2960 L2 | **3650 L3** |
-| **Routing** | ✗ Няма | ✅ Inter-VLAN routing |
-| **Gateway** | ✗ Не работи | ✅ HSRP Virtual IP |
-| **Redundancy** | ✗ Липсва | ✅ Redundant links + HSRP |
-| **QoS** | ✗ Липсва | ✅ Enabled на Distribution |
-| **Spanning Tree** | Default | ✅ Оптимизиран (Root на Core) |
-| **PC connectivity** | Само в един VLAN | **Между всички VLAN** |
 
 ---
 
 ## ЧЕСТО СРЕЩАНИ ПРОБЛЕМИ
 
-### Проблем 1: PC не могат да ping между VLAN-и
+### Проблем 1: Портовете на 3650 са червени, CLI не отговаря
+
+**Причина:** Няма захранващ модул
+**Решение:** Physical → плъзнете **AC-POWER-SUPPLY** в слота за захранване → включете устройството
+
+### Проблем 2: PC не могат да ping между VLAN-и
 
 **Причина:** `ip routing` не е enabled на Distribution
 **Решение:**
@@ -743,58 +789,80 @@ ip routing
 end
 ```
 
-### Проблем 2: "% Incomplete command" при SVI creation
+### Проблем 3: "% Invalid input" при `interface gigabitEthernet 0/1` на 3650
+
+**Причина:** На 3650 портовете са Gi1/0/x
+**Решение:** Проверете имената с `show ip interface brief` и използвайте Gi1/0/1 – Gi1/0/24
+
+### Проблем 4: "% Incomplete command" при SVI creation
 
 **Причина:** Switch не е multilayer или не е в L3 mode
 **Решение:**
 ```cisco
-! Провери модела:
+! Проверка на модела:
 show version
 
 ! Трябва да е 3560/3650/3750 (multilayer)
-! В PT, използвай Multilayer Switch, не обикновен 2960!
+! В PT, използвайте Multilayer Switch, не обикновен 2960!
 ```
 
-### Проблем 3: HSRP не работи
+### Проблем 5: HSRP не работи (двата комутатора са Active или няма Standby)
 
-**Причина:** HSRP track на интерфейс не е конфигуриран
+**Причина:** Различен номер на група или виртуален IP, VLAN-ът липсва в trunk-а между Distribution комутаторите (през Core) или SVI е down
 **Решение:**
 ```cisco
-! Провери HSRP:
-show standby
-
-! Виж дали virtual IP е active
-! Виж priority и preempt
+show standby brief
+show interfaces trunk
+show ip interface brief
 ```
+Tracking (`standby track`) е допълнителен механизъм и не е нужен за основната работа на HSRP.
 
-### Проблем 4: Spanning Tree loop
+### Проблем 6: Root Bridge не е Core-SW
 
-**Причина:** Core не е Root Bridge
+**Причина:** Не е зададен priority; Root става комутаторът с най-нисък MAC адрес
+**Последица:** Неоптимален път на трафика (не loop – STP продължава да предотвратява цикли)
 **Решение:**
 ```cisco
 ! На Core-SW:
-spanning-tree vlan 1-4094 priority 4096
+spanning-tree vlan 10,20,30,40,99 priority 4096
 
-! Провери:
+! Проверка:
 show spanning-tree root
 ```
+
+### Проблем 7: Комутатор не се достига по SSH от PC
+
+**Причина:** Липсва `ip default-gateway 10.99.99.1` (Access), маршрутът на Core или HSRP група 99
+**Решение:** `show standby brief` на Dist-SW1 (група 99), `show ip route` на Core-SW, ping 10.99.99.1 от комутатора
 
 ---
 
 ## ЗАДАЧИ ЗА САМОСТОЯТЕЛНА РАБОТА
 
-### Задача 1: OSPF Routing Protocol
-Конфигурирай OSPF между Core и Distribution за динамично routing:
+### Задача 1: OSPF между L3 комутаторите
+
+В основната топология OSPF не е нужен: Dist-SW1 и Dist-SW2 имат директно свързани всички VLAN-и, а Core използва статичен маршрут. Задачата показва как Core научава потребителските мрежи динамично.
+
 ```cisco
-! На всички L3 switches:
+! Core-SW:
+interface loopback 0
+ ip address 10.0.0.1 255.255.255.255
 router ospf 1
- router-id X.X.X.X
+ router-id 1.1.1.1
+ network 10.99.99.0 0.0.0.255 area 0
+ network 10.0.0.1 0.0.0.0 area 0
+
+! Dist-SW1 (router-id 2.2.2.2) и Dist-SW2 (router-id 3.3.3.3):
+router ospf 1
+ router-id 2.2.2.2
  network 192.168.0.0 0.0.255.255 area 0
  network 10.99.99.0 0.0.0.255 area 0
 ```
 
+**Проверка:** `show ip ospf neighbor`; на Core-SW `show ip route ospf` показва маршрути **O** към 192.168.10.0 – 192.168.40.0. След това статичният маршрут на Core може да се премахне (`no ip route 0.0.0.0 0.0.0.0 10.99.99.1`).
+
 ### Задача 2: ACL за Security
-Ограничи достъпа между отделения:
+Ограничете достъпа между отделите:
 ```cisco
 ! Пример: HR не може да достъпва Sales
 ip access-list extended BLOCK-HR-TO-SALES
@@ -805,8 +873,12 @@ interface vlan 30
  ip access-group BLOCK-HR-TO-SALES in
 ```
 
-### Задача 3: Advanced QoS
-Създай class maps и policy maps за приоритизиране:
+**Важно:** Приложете ACL на **Dist-SW1 и Dist-SW2**. Иначе след HSRP failover филтрирането изчезва.
+
+### Задача 3: QoS (теоретична, BONUS)
+
+3650 използва MQC (class-map/policy-map) на IOS XE; командите `mls qos` от 3560/3750 не се прилагат. Примерът показва синтаксиса за обсъждане – поддръжката му в Packet Tracer 8.2.2 трябва да се провери, а на Catalyst комутаторите част от опциите (напр. `fair-queue`) не се поддържат.
+
 ```cisco
 class-map match-any VOICE
  match ip dscp ef
@@ -846,23 +918,24 @@ interface vlan 10
 - Превенция на L2 loops
 - Root Bridge е референтна точка
 - Портове в Blocking state за redundancy
-- RSTP (Rapid STP) - по-бърз convergence
+- RSTP (Rapid STP) - по-бърз convergence (няколко секунди, ако `rapid-pvst` е на всички комутатори)
 
 ---
 
 ## СЛЕДВАЩИ СТЪПКИ
 
-Сега знаеш как да:
-- Изграждаш правилна йерархична топология с L3 routing
-- Конфигурираш inter-VLAN routing със SVI
-- Прилагаш HSRP за gateway redundancy
-- Тестваш fault tolerance и failover
+Сега можете да:
+- Изграждате правилна йерархична топология с L3 routing
+- Конфигурирате inter-VLAN routing със SVI
+- Управлявате комутаторите през Management VLAN и SSH
+- Прилагате HSRP за gateway redundancy
+- Тествате fault tolerance и failover
 
 **Следващ лаб:** Lab 8 - NAT Configuration with WAN connectivity
 
 ---
 
-**Важно:** Запази .pkt файла като `Lab7_Hierarchical_L3_Routing.pkt`
+**Важно:** Запазете .pkt файла като `Lab7_YourName.pkt`
 
 ---
 

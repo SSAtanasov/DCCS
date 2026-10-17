@@ -258,19 +258,19 @@ access-list 10 permit any    ← БЕЗ ТОВА: всички останали 
               192.168.20.1 (VLAN 20)
                    |
             GigE0/0 (trunk)
-                   |
-              [Switch SW1]
-         /     |     |     |     \
-     Fa0/11 Fa0/2 Fa0/3 Fa0/4 Fa0/5
-        |     |     |     |     |
-      DNS   PC1   PC2   PC3   PC4
-     Server Admin Admin  IT    IT
+                   |        Gi0/1 (trunk)
+              [Switch SW1] -----------[Switch SW2]
+         /     |     |     |     \      /      \
+     Fa0/11 Fa0/2 Fa0/3 Fa0/4 Fa0/5   Fa0/2  Fa0/3
+        |     |     |     |     |       |      |
+      DNS   PC1   PC2   PC3   PC4     [PC5]  [PC6]
+     Server Admin Admin  IT    IT     VLAN10 VLAN20
    .10.2  .10.11 .10.12 .20.11 .20.12
    
    VLAN 10 (Admin)       VLAN 20 (IT)
 ```
 
-**+ SW2 (Access):** свързан към SW1 Gi0/1 с trunk; PC5 (VLAN 10) и PC6 (VLAN 20) - от Lab 2, Част 3А (не е показан на схемата).
+**+ SW2 (Access):** свързан към SW1 Gi0/1 с trunk; PC5 (VLAN 10) и PC6 (VLAN 20) - от Lab 2, Част 3А.
 
 ### Мрежова информация от предишните лабове:
 
@@ -613,7 +613,7 @@ R1(config-line)# exit
 R1(config)# service password-encryption
 ```
 
-**Пароли:** `cisco123`, `cisco` и `class123` в упражненията са само примерни. В курсовия проект са **забранени** - използвайте силни пароли (поне 10 символа с букви, цифри и знаци). `service password-encryption` скрива паролите в конфигурацията.
+**Пароли:** `cisco123`, `cisco` и `class123` в упражненията са само примерни. В курсовия проект са **забранени** - използвайте силни пароли (поне 10 символа с букви, цифри и знаци). `service password-encryption` само маскира паролите, зададени с `password`, чрез обратим алгоритъм (type 7) и не ги прави криптографски защитени. Защитата идва от `enable secret` и `username ... secret`.
 
 **Забележка:** Ако рутерът има и линии vty 5–15 (проверете с `show running-config`), приложете към тях същите настройки (`line vty 5 15`), както и `access-class 50 in` в Стъпка 3. Иначе тези линии остават извън защитата.
 
@@ -919,13 +919,15 @@ Port Security **ограничава кои MAC адреси** могат да �
 SW1(config)# interface range FastEthernet0/2 - 3
 SW1(config-if-range)# switchport mode access
 SW1(config-if-range)# switchport port-security
-SW1(config-if-range)# switchport port-security maximum 2
+SW1(config-if-range)# switchport port-security maximum 1
 SW1(config-if-range)# switchport port-security mac-address sticky
 SW1(config-if-range)# switchport port-security violation restrict
 SW1(config-if-range)# exit
 ```
 
 **Защо два порта?** Курсовият проект изисква Port Security на минимум 2 switch порта (тук Fa0/2 и Fa0/3 - PC1 и PC2).
+
+**Защо `maximum 1`?** Числото е броят разрешени MAC адреси **на всеки порт**, а не броят защитени портове. Към Fa0/2 и Fa0/3 е свързан по един компютър, затова е разрешен един адрес. С `maximum 2` втори (чужд) компютър би бил приет без нарушение.
 
 ### Violation modes:
 
@@ -941,6 +943,15 @@ SW1(config-if-range)# exit
 SW1# show port-security interface FastEthernet0/2
 SW1# show port-security address
 ```
+
+### Тест на нарушение
+
+1. От PC1 и PC2 изпълнете `ping 192.168.10.1`, за да се научат sticky MAC адресите
+2. `show port-security address` → по един запис за Fa0/2 и Fa0/3
+3. Откачете PC1 от Fa0/2 и свържете на негово място нов PC (Test-PC, статичен IP 192.168.10.30/24, Gateway 192.168.10.1)
+4. От Test-PC `ping 192.168.10.1` → **неуспешен**
+5. `show port-security interface FastEthernet0/2` → Security Violation Count е по-голям от 0; при `restrict` портът остава up
+6. Премахнете Test-PC и свържете отново PC1 към Fa0/2 (преди записа на файла)
 
 ---
 

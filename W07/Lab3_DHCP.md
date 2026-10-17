@@ -63,13 +63,13 @@
               [Router R1]
                    |
             GigE0/0 (trunk)
-                   |
-              [Switch SW1]
-               /   |   \   \
-           Fa0/2 Fa0/3 Fa0/4 Fa0/5
-             /     |     \     \
-        [PC1]  [PC2]  [PC3]  [PC4]
-       VLAN10 VLAN10 VLAN20 VLAN20
+                   |        Gi0/1 (trunk)
+              [Switch SW1] ----------[Switch SW2]
+               /   |   \   \           /      \
+           Fa0/2 Fa0/3 Fa0/4 Fa0/5   Fa0/2  Fa0/3
+             /     |     \     \       |      |
+        [PC1]  [PC2]  [PC3]  [PC4]   [PC5]  [PC6]
+       VLAN10 VLAN10 VLAN20 VLAN20   VLAN10 VLAN20
 ```
 
 **VLAN-и:**
@@ -166,13 +166,13 @@ R1(config)# no ip dhcp pool IT_POOL
               [Router R1]
                    |
             GigE0/0 (trunk)
-                   |
-              [Switch SW1]
-          /     |     |     \     \
-       Fa0/11 Fa0/2 Fa0/3 Fa0/4 Fa0/5
-         |     |     |     |     |
-     [Server] [PC1] [PC2] [PC3] [PC4]
-      DHCP   VLAN10 VLAN10 VLAN20 VLAN20
+                   |        Gi0/1 (trunk)
+              [Switch SW1] ----------------[Switch SW2]
+          /     |     |     \     \          /      \
+       Fa0/11 Fa0/2 Fa0/3 Fa0/4 Fa0/5      Fa0/2  Fa0/3
+         |     |     |     |     |           |      |
+     [Server] [PC1] [PC2] [PC3] [PC4]      [PC5]  [PC6]
+      DHCP   VLAN10 VLAN10 VLAN20 VLAN20   VLAN10 VLAN20
 ```
 
 ### Стъпка 1: Добавяне на Server

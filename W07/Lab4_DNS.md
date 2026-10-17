@@ -159,13 +159,13 @@ CNAME сочи към ДРУГО ИМЕ, което има A record.
               [Router R1]
                    |
             GigE0/0 (trunk)
-                   |
-              [Switch SW1]
-       /       |     |     |     \     \     \
-   Fa0/11  Fa0/6 Fa0/2 Fa0/3 Fa0/4 Fa0/5 Fa0/7
-      |       |     |     |     |     |     |
-  [Server] [Server][PC1] [PC2] [PC3] [PC4] (празен)
-  DNS(10.2) File   Admin Admin  IT    IT
+                   |        Gi0/1 (trunk)
+              [Switch SW1] ---------------------------[Switch SW2]
+       /       |     |     |     \     \     \          /      \
+   Fa0/11  Fa0/6 Fa0/2 Fa0/3 Fa0/4 Fa0/5 Fa0/7        Fa0/2  Fa0/3
+      |       |     |     |     |     |     |           |      |
+  [Server] [Server][PC1] [PC2] [PC3] [PC4] (празен)   [PC5]  [PC6]
+  DNS(10.2) File   Admin Admin  IT    IT              VLAN10 VLAN20
            (10.50)
            бонус Lab3
 ```
