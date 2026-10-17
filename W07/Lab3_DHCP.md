@@ -7,6 +7,8 @@
 
 **Предварителни изисквания:** Завършен Lab 2 (VLAN-и и Inter-VLAN routing)
 
+**Начален файл:** Отворете `Lab2_VLANs_YourName.pkt` (основния файл, без бонуса и задачите) и го запазете като `Lab3_DHCP_YourName.pkt`.
+
 ---
 
 ## ЧАСТ 1: Какво е DHCP? (5 мин)
@@ -74,6 +76,8 @@
 - VLAN 10: 192.168.10.0/24
 - VLAN 20: 192.168.20.0/24
 
+**+ SW2 (Access):** свързан към SW1 Gi0/1 с trunk; PC5 (VLAN 10) и PC6 (VLAN 20) - от Lab 2, Част 3А.
+
 ---
 
 ## ЧАСТ 3: Метод 1 - Router като DHCP сървър (25 мин)
@@ -112,6 +116,10 @@ R1(dhcp-config)# exit
 - `default-router` → Gateway-ят (Router interface IP)
 - `dns-server` → DNS за name resolution
 
+**Забележка:** `8.8.8.8` демонстрира DHCP опцията за DNS сървър. В тази топология няма изход към интернет, затова 8.8.8.8 няма да отговаря. Локален DNS сървър (192.168.10.2) се добавя в Lab 4.
+
+**Lease time (по избор):** ако Packet Tracer приема командата (проверете с `R1(dhcp-config)# lease ?`), задайте срока в pool-а, напр. `lease 7` (7 дни) или `lease 0 8` (8 часа). В курсовия проект lease time се изисква, ако симулаторът го поддържа; иначе опишете избрания срок в документацията.
+
 ### Стъпка 3: DHCP pool за VLAN 20
 
 ```cisco
@@ -129,17 +137,28 @@ R1(config)# exit
 R1# copy running-config startup-config
 ```
 
-**Забележка:** На Router НЕ можем да настроим lease time в Packet Tracer.
+**Забележка:** В реален Cisco IOS lease time се настройва с командата `lease` в DHCP pool. В Packet Tracer 8.2.2 проверете дали командата е налична (`lease ?` в режима на pool-а); ако не е, настройката остава теоретична.
 
 ---
 
 ## ЧАСТ 4: Метод 2 - Server като DHCP (BONUS - 15 мин)
 
+⚠️ **ВАЖНО:** Това е **алтернативен**, а не паралелен метод. Изпълнете първо Части 5–6 с Метод 1 и запазете основния файл. Метод 2 изпробвайте в **отделен файл** (`Lab3_Bonus_ServerDHCP.pkt`): два DHCP сървъра в една VLAN си пречат, а в Lab 4 адресът 192.168.10.2 и портът Fa0/11 са за DNS сървъра.
+
+В отделния файл първо изключете DHCP на R1:
+
+```cisco
+R1(config)# no ip dhcp pool ADMIN_POOL
+R1(config)# no ip dhcp pool IT_POOL
+```
+
 ### Предимства на Server метода:
 
 ✅ Има GUI (по-лесно за начинаещи)  
-✅ **Lease Time работи!** (можем да настроим часове/дни)  
+✅ **Lease Time** (ако вашата версия на PT има това поле)  
 ✅ Виждаме всички настройки наведнъж  
+
+**Забележка:** Официалната помощ на Packet Tracer изброява за DHCP pool на Server-PT полетата Pool Name, Default Gateway, DNS Server, Start IP Address, Subnet Mask и Maximum Number of Users. Ако във вашата версия няма поле Lease Time, тази настройка остава теоретична.
 
 ### Топология със Server:
 
@@ -166,6 +185,7 @@ SW1(config)# interface FastEthernet0/11
 SW1(config-if)# switchport mode access
 SW1(config-if)# switchport access vlan 10
 SW1(config-if)# description DHCP-Server
+SW1(config-if)# no shutdown
 SW1(config-if)# exit
 ```
 
@@ -195,7 +215,7 @@ Default Gateway: 192.168.10.1
    Maximum Number of Users: 50
    TFTP Server: (празно)
    WLC Address: (празно)
-   Lease Time: 1 Days (или колкото искате!)
+   Lease Time: 1 Days (само ако полето съществува във вашата версия)
    ```
    → Кликнете **Add**
 
@@ -207,7 +227,7 @@ Default Gateway: 192.168.10.1
    Start IP Address: 192.168.20.11
    Subnet Mask: 255.255.255.0
    Maximum Number of Users: 50
-   Lease Time: 7 Days
+   Lease Time: 7 Days (само ако полето съществува)
    ```
    → Кликнете **Add**
 
@@ -227,7 +247,7 @@ R1(config-subif)# exit
 
 ## ЧАСТ 5: Конфигурация на PC-тата (10 мин)
 
-### За всеки PC (PC1, PC2, PC3, PC4):
+### За всеки PC (PC1–PC6):
 
 1. **Кликнете:** PC → Desktop → IP Configuration
 2. **Изберете:** DHCP (вместо Static)
@@ -261,7 +281,7 @@ ipconfig /renew
 ipconfig
 ```
 
-**Очаквано за PC1 (VLAN 10):**
+**Очаквано за PC1 (VLAN 10)** (примерно - реалният адрес зависи от реда на заявките, проверете с `ipconfig`):
 ```
 IP Address: 192.168.10.11
 Subnet Mask: 255.255.255.0
@@ -361,6 +381,8 @@ ip dhcp pool ADMIN_POOL
 
 ## ЧАСТ 8: Статична резервация за Server (BONUS - 10 мин)
 
+**Забележка:** Бонусът е незадължителен. Ако го изпълните, File Server може да остане в основния файл (Lab 4 го предвижда на Fa0/6 и 192.168.10.50).
+
 ### Scenario:
 Искаме File Server винаги да получава **192.168.10.50**
 
@@ -379,17 +401,18 @@ SW1(config)# interface FastEthernet0/6
 SW1(config-if)# switchport mode access  
 SW1(config-if)# switchport access vlan 10
 SW1(config-if)# description File-Server
+SW1(config-if)# no shutdown
 SW1(config-if)# exit
 ```
 
 ### Стъпка 2: Намерете MAC адреса
 
-**От Router:**
-```cisco
-R1# show ip dhcp binding
+**File Server → Config → FastEthernet0 → MAC Address**
 
-IP address       Hardware address
-192.168.10.13    00D0.974B.97FC    ← Това е File Server
+(Ако сървърът вече е на DHCP, MAC адресът се вижда и с `R1# show ip dhcp binding`.)
+
+```
+Пример: 00D0.974B.97FC    ← вашият MAC адрес ще е различен!
 ```
 
 ### Стъпка 3: Excluded address
@@ -410,7 +433,7 @@ R1(dhcp-config)# default-router 192.168.10.1
 R1(dhcp-config)# exit
 ```
 
-**Забележка:** Client-identifier = "01" + MAC адрес
+**Забележка:** Client-identifier = "01" + MAC адрес. Използвайте **вашия** MAC адрес, а не примерния.
 
 **⚠️ ВАЖНО:** В Packet Tracer използвайте **client-identifier** (НЕ hardware-address)!
 
@@ -425,6 +448,12 @@ R1(dhcp-config)# exit
 IP Address: 192.168.10.50
 ```
 
+**Проверка:** `R1# show ip dhcp binding` и `R1# show ip dhcp pool FILE_SERVER`.
+
+**Ако сървърът не получи .50:** сравнете client-identifier с колоната Client-ID в `show ip dhcp binding` (идентификаторът не винаги е "01" + MAC) и проверете дали excluded-address не пречи на резервацията във вашата версия на Packet Tracer.
+
+**Резервен вариант:** задайте на File Server статичен адрес 192.168.10.50 (Desktop → IP Configuration → Static, маска 255.255.255.0, Gateway 192.168.10.1). Командата excluded-address вече пази адреса от DHCP. Това не е DHCP резервация, но дава същия краен резултат.
+
 **Забележка:** Web Server ще добавим в **Lab 4** на адрес **192.168.10.3**
 
 ---
@@ -434,7 +463,7 @@ IP Address: 192.168.10.50
 | Аспект | Router DHCP | Server DHCP |
 |--------|-------------|-------------|
 | **Конфигурация** | CLI команди | GUI (по-лесно) |
-| **Lease Time** | ❌ Не работи в PT | ✅ Работи! |
+| **Lease Time** | ⚠️ Проверете с `lease ?` | ⚠️ Зависи от версията на PT |
 | **Flexibility** | По-гъвкав | Основни настройки |
 | **За бакалаври** | Трябва да знаят IOS | По-достъпно |
 | **Реален свят** | Често се използва | При малки мрежи |
@@ -444,10 +473,22 @@ IP Address: 192.168.10.50
 
 ---
 
+## ЗАПИС НА ОСНОВНИЯ ФАЙЛ (за Lab 4)
+
+**Контролен тест:** DHCP сървърът е само R1; PC1–PC4 получават адреси (`ipconfig`); PC1 → PC3 ping успешен; `show ip dhcp binding` показва клиентите.
+
+**Запазете файла като:** `Lab3_DHCP_YourName.pkt` – това е началният файл за Lab 4.
+
+**Задачите по-долу изпълнявайте в отделен файл** (`Lab3_Extra_YourName.pkt`).
+
+---
+
 ## ЗАДАЧИ ЗА САМОСТОЯТЕЛНА РАБОТА
 
 ### Задача 1: Трети VLAN
 - Създайте VLAN 30 (Guest: 192.168.30.0/24)
+- Добавете VLAN 30 към trunk-а (Fa0/1): `switchport trunk allowed vlan add 30`
+- Добавете subinterface на R1 (`interface g0/0.30`, `encapsulation dot1Q 30`, IP 192.168.30.1)
 - Добавете DHCP pool
 - Тествайте с нов PC
 
@@ -458,7 +499,7 @@ IP Address: 192.168.10.50
 
 ### Задача 3: Server DHCP
 - Пробвайте Server метода (ЧАСТ 4)
-- Настройте lease time на 2 дни
+- Ако вашата версия има поле Lease Time, настройте го на 2 дни
 - Сравнете с Router метода
 
 ---
@@ -497,7 +538,7 @@ IP Address: 192.168.10.50
 - Name resolution (ping по име вместо IP)
 - Интеграция на DHCP със DNS
 
-**Запазете файла като:** `Lab3_DHCP_YourName.pkt`
+**Запазете файла като:** `Lab3_DHCP_YourName.pkt` (преди задачите; тях запазете отделно като `Lab3_Extra_YourName.pkt`)
 
 ---
 

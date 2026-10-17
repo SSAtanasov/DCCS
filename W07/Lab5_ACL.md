@@ -3,9 +3,11 @@
 
 **Цел:** Да се научите да създавате и прилагате ACL за контрол на достъпа между мрежи и VLAN-и.
 
-**Продължителност:** 75-90 минути
+**Продължителност:** 120-135 минути (основната част; Част 9 е BONUS)
 
 **Предварителни изисквания:** Завършени Lab 1-4 (особено Lab 2 с VLAN-и)
+
+**Начален файл:** Отворете `Lab4_DNS_YourName.pkt` и го запазете като `Lab5_ACL_YourName.pkt`.
 
 ---
 
@@ -44,9 +46,9 @@
 | Характеристика | Standard ACL | Extended ACL | Named ACL |
 |----------------|-------------|--------------|-----------|
 | **ACL номера** | 1-99, 1300-1999 | 100-199, 2000-2699 | Име (текст) |
-| **Филтрира по** | Source IP **САМО** | Source, Dest, Protocol, Port | Като Extended |
+| **Филтрира по** | Source IP **САМО** | Source, Dest, Protocol, Port | Според типа (standard или extended) |
 | **Гъвкавост** | Ограничена | Много гъвкав | Най-гъвкав |
-| **Къде прилагаме** | Близо до **destination** | Близо до **source** | Като Extended |
+| **Къде прилагаме** | Близо до **destination** | Близо до **source** | Според типа |
 | **Пример** | `access-list 10 deny host 192.168.10.11` | `access-list 100 permit tcp ... eq 80` | `ip access-list extended WEB_ACCESS` |
 | **Кога използваме** | Блокиране на цели мрежи | Детайлен контрол (port, protocol) | Модерен подход (препоръчителен) |
 
@@ -268,6 +270,8 @@ access-list 10 permit any    ← БЕЗ ТОВА: всички останали 
    VLAN 10 (Admin)       VLAN 20 (IT)
 ```
 
+**+ SW2 (Access):** свързан към SW1 Gi0/1 с trunk; PC5 (VLAN 10) и PC6 (VLAN 20) - от Lab 2, Част 3А (не е показан на схемата).
+
 ### Мрежова информация от предишните лабове:
 
 | VLAN | Име | Network | Gateway | DNS Server |
@@ -282,7 +286,7 @@ access-list 10 permit any    ← БЕЗ ТОВА: всички останали 
 - **PC3:** 192.168.20.11 (VLAN 20 - IT)
 - **PC4:** 192.168.20.12 (VLAN 20 - IT)
 
-**Забележка:** Ако вашата топология от Lab 4 има различни IP адреси, използвайте ги в примерите по-долу.
+**Забележка:** Адресите на PC-тата са получени от DHCP и са ориентировъчни. Проверете реалните с `ipconfig` и ги използвайте в примерите по-долу (особено в правилото `host 192.168.20.11` в Част 5).
 
 ---
 
@@ -368,8 +372,10 @@ ping 192.168.10.11    ← ❌ НЕ РАБОТИ (блокиран)
 
 **От PC1 (Admin VLAN - 192.168.10.11):**
 ```
-ping 192.168.20.11    ← ✅ РАБОТИ (Admin → IT позволен)
+ping 192.168.20.11    ← ❌ НЕ РАБОТИ
 ```
+
+**Защо?** Заявката от PC1 стига до PC3, но отговорът (ICMP Echo Reply) идва от 192.168.20.11 и се блокира от ACL 10 на изхода към VLAN 10. ACL не помни връзките (stateless): всяко правило се прилага към всеки пакет поотделно, включително към отговорите.
 
 **От PC1 към PC2 (и двата Admin VLAN):**
 ```
@@ -390,10 +396,10 @@ R1# show ip interface GigabitEthernet0/0.10 | include access list
 
 ---
 
-## ЧАСТ 4: Extended ACL - Разрешаване само HTTP/HTTPS (30 мин)
+## ЧАСТ 4: Extended ACL - Разрешаване на HTTP/HTTPS, DNS и ICMP (30 мин)
 
 ### Изискване:
-**IT VLAN може да достъпва само HTTP (80) и HTTPS (443) към Admin VLAN, но не и други услуги**
+**IT VLAN може да достъпва към Admin VLAN само HTTP (80), HTTPS (443), DNS (53) към DNS сървъра и ICMP (за тестване)**
 
 ### Стъпка 1: Премахване на предишния ACL
 
@@ -412,6 +418,8 @@ R1(config)# access-list 100 remark IT to Admin - HTTP/HTTPS only
 R1(config)# access-list 100 permit tcp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 80
 R1(config)# access-list 100 permit tcp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 443
 R1(config)# access-list 100 permit icmp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
+R1(config)# access-list 100 permit udp 192.168.20.0 0.0.0.255 host 192.168.10.2 eq 53
+R1(config)# access-list 100 permit tcp 192.168.20.0 0.0.0.255 host 192.168.10.2 eq 53
 R1(config)# access-list 100 deny ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
 R1(config)# access-list 100 permit ip any any
 ```
@@ -424,8 +432,9 @@ R1(config)# access-list 100 permit ip any any
 1. Permit TCP port 80 (HTTP) от IT към Admin
 2. Permit TCP port 443 (HTTPS) от IT към Admin
 3. Permit ICMP (ping) от IT към Admin - за тестване
-4. Deny всичко останало от IT към Admin
-5. Permit всичко останало (други VLAN-и или трафик)
+4. Permit DNS (UDP и TCP 53) към DNS сървъра 192.168.10.2 - иначе имената от Lab 4 спират да работят за VLAN 20
+5. Deny всичко останало от IT към Admin
+6. Permit всичко останало (други VLAN-и или трафик)
 
 ### Стъпка 3: Прилагане на ACL
 
@@ -447,18 +456,23 @@ R1# copy running-config startup-config
 
 **От PC3 (IT VLAN - 192.168.20.11):**
 ```
-ping 192.168.10.2      ← DNS Server → ✅ РАБОТИ (ICMP permitnat)
+ping 192.168.10.2      ← DNS Server → ✅ РАБОТИ (ICMP е разрешен)
 ping 192.168.10.11     ← PC1 → ✅ РАБОТИ
+nslookup server.company.local  ← ✅ РАБОТИ (DNS е разрешен)
 ```
 
 **Симулиране на HTTP трафик (Packet Tracer):**
 - Desktop → Web Browser → http://192.168.10.2
 - Ако има HTTP server на DNS-а → ✅ РАБОТИ
+- Server-PT има HTTP услуга (Services → HTTP: On), затова тестът работи и без Web Server от Lab 4
+- HTTPS (443) се тества само ако HTTPS услугата на сървъра е On: `https://192.168.10.2`. Разрешението в ACL не създава HTTPS сървър.
 
 **Тестване на блокирани услуги:**
 ```
 telnet 192.168.10.2 23  ← Telnet → ❌ НЕ РАБОТИ (блокиран)
 ```
+
+**Внимание:** DNS Server няма Telnet услуга, затова неуспехът сам по себе си не доказва действието на ACL. Доказателството е броячът на правилото `deny` в `show access-lists 100`: той трябва да се увеличи след опита.
 
 **От PC1 (Admin VLAN → 192.168.10.11):**
 ```
@@ -473,8 +487,10 @@ Extended IP access list 100
     10 permit tcp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 eq www
     20 permit tcp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 443
     30 permit icmp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 (3 matches)
-    40 deny ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
-    50 permit ip any any (15 matches)
+    40 permit udp 192.168.20.0 0.0.0.255 host 192.168.10.2 eq domain
+    50 permit tcp 192.168.20.0 0.0.0.255 host 192.168.10.2 eq domain
+    60 deny ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
+    70 permit ip any any (15 matches)
 
 R1# show ip interface GigabitEthernet0/0.20
 GigabitEthernet0/0.20 is up, line protocol is up
@@ -510,10 +526,12 @@ R1(config)# no access-list 100
 
 ```cisco
 R1(config)# ip access-list extended IT_TO_ADMIN
-R1(config-ext-nacl)# remark Allow only HTTP and HTTPS from IT to Admin
+R1(config-ext-nacl)# remark Allow HTTP, HTTPS, ICMP and DNS from IT to Admin
 R1(config-ext-nacl)# permit tcp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 80
 R1(config-ext-nacl)# permit tcp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 443
 R1(config-ext-nacl)# permit icmp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
+R1(config-ext-nacl)# permit udp 192.168.20.0 0.0.0.255 host 192.168.10.2 eq 53
+R1(config-ext-nacl)# permit tcp 192.168.20.0 0.0.0.255 host 192.168.10.2 eq 53
 R1(config-ext-nacl)# deny ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
 R1(config-ext-nacl)# permit ip any any
 R1(config-ext-nacl)# exit
@@ -541,6 +559,8 @@ R1(config-ext-nacl)# exit
 
 **Номерът 15** поставя правилото ПРЕДИ правило 20.
 
+**Забележка:** Правило 15 е само учебен пример: то разрешава SSH от 192.168.20.11 към **всеки** адрес. Затова по-долу го изтриваме (`no 15`).
+
 ### Показване на правилата с номера:
 
 ```cisco
@@ -550,8 +570,10 @@ Extended IP access list IT_TO_ADMIN
     15 permit tcp host 192.168.20.11 any eq 22
     20 permit tcp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 443
     30 permit icmp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
-    40 deny ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
-    50 permit ip any any
+    40 permit udp 192.168.20.0 0.0.0.255 host 192.168.10.2 eq domain
+    50 permit tcp 192.168.20.0 0.0.0.255 host 192.168.10.2 eq domain
+    60 deny ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
+    70 permit ip any any
 ```
 
 ### Изтриване на конкретно правило:
@@ -564,7 +586,7 @@ R1(config-ext-nacl)# exit
 
 ---
 
-## ЧАСТ 6: SSH Access Control на Router (15 мин)
+## ЧАСТ 6: SSH на всички мрежови устройства и контрол на достъпа (25 мин)
 
 ### Изискване:
 **Само Admin VLAN (192.168.10.0/24) може да прави SSH към router-а**
@@ -588,7 +610,12 @@ R1(config)# line vty 0 4
 R1(config-line)# transport input ssh
 R1(config-line)# login local
 R1(config-line)# exit
+R1(config)# service password-encryption
 ```
+
+**Пароли:** `cisco123`, `cisco` и `class123` в упражненията са само примерни. В курсовия проект са **забранени** - използвайте силни пароли (поне 10 символа с букви, цифри и знаци). `service password-encryption` скрива паролите в конфигурацията.
+
+**Забележка:** Ако рутерът има и линии vty 5–15 (проверете с `show running-config`), приложете към тях същите настройки (`line vty 5 15`), както и `access-class 50 in` в Стъпка 3. Иначе тези линии остават извън защитата.
 
 ### Стъпка 2: Създаване на Standard ACL за VTY
 
@@ -625,10 +652,12 @@ Password: cisco123
 
 **От PC3 (IT VLAN - 192.168.20.11):**
 ```
-ssh -l admin 192.168.10.1
+ssh -l admin 192.168.20.1
 
-❌ Connection refused или timeout
+❌ Connection refused (отказ от ACL 50)
 ```
+
+**Защо към 192.168.20.1?** Това е gateway-ят на PC3, затова трафикът не минава през `IT_TO_ADMIN`. Така отказът идва само от `access-class 50`. При опит към 192.168.10.1 връзката се спира още от `IT_TO_ADMIN` и тестът не доказва действието на ACL 50.
 
 ### Верификация:
 
@@ -642,6 +671,31 @@ R1# show line vty 0 4 | include access
 Access Class 50
 ```
 
+### Стъпка 5: SSH на комутаторите (SW1 и SW2)
+
+Курсовият проект изисква SSH на **всички** мрежови устройства. На всеки комутатор:
+
+```cisco
+SW1(config)# ip domain-name company.local
+SW1(config)# crypto key generate rsa
+How many bits in the modulus [512]: 1024
+SW1(config)# username admin secret cisco123
+SW1(config)# line vty 0 15
+SW1(config-line)# transport input ssh
+SW1(config-line)# login local
+SW1(config-line)# exit
+```
+
+Повторете същото на SW2.
+
+**Предпоставка:** IP адрес за управление (SVI във VLAN 99) и `ip default-gateway` - вече са конфигурирани в Lab 2 (SW1: 192.168.99.2, SW2: 192.168.99.3).
+
+**Тест от PC1 (Admin):**
+```
+ssh -l admin 192.168.99.2
+ssh -l admin 192.168.99.3
+```
+
 ---
 
 ## ЧАСТ 7: Troubleshooting ACL (10 мин)
@@ -651,9 +705,9 @@ Access Class 50
 | Грешка | Симптом | Как да проверим | Решение |
 |--------|---------|-----------------|---------|
 | **Забравен `permit any`** | Всичко блокирано (implicit deny) | `show access-lists` | Добави `access-list X permit any` |
-| **Грешна посока (IN/OUT)** | ACL не работи | `show ip interface GigE0/0.X` | Промени на правилната посока |
+| **Грешна посока (IN/OUT)** | ACL не работи | `show ip interface g0/0.X` | Промени на правилната посока |
 | **Subnet mask вместо wildcard** | Филтрира грешно | Проверка на командата | Използвай `255.255.255.255 - subnet` |
-| **ACL на физически интерфейс** | Не работи за Router-on-a-Stick | `show ip interface GigE0/0` | Приложи на subinterface (.10, .20) |
+| **ACL на физически интерфейс** | Не работи за Router-on-a-Stick | `show ip interface g0/0` | Приложи на subinterface (.10, .20) |
 | **Грешен ред на правилата** | Първото правило блокира всичко | `show access-lists` | Пренареди с Named ACL |
 
 ---
@@ -682,6 +736,8 @@ clear ip access-list counters
 ---
 
 ### Debug команди (ВНИМАВАЙТЕ - генерират много output!):
+
+**Забележка:** Някои debug команди (напр. `debug ip access-list`) може да не се поддържат в Packet Tracer. Основните средства за проверка са `show access-lists` и `show ip interface`.
 
 ```cisco
 ! Включване
@@ -752,15 +808,19 @@ R1# show access-lists
 **СПЕШНО решение:**
 ```cisco
 ! Влез през CONSOLE кабел (физически достъп)
-Router> enable
-Router# configure terminal
-Router(config)# line vty 0 4
-Router(config-line)# no access-class 50 in
-Router(config-line)# exit
-Router(config)# access-list 50 permit 192.168.10.0 0.0.0.255
-Router(config)# line vty 0 4
-Router(config-line)# access-class 50 in
+R1> enable
+R1# configure terminal
+R1(config)# line vty 0 4
+R1(config-line)# no access-class 50 in
+R1(config-line)# exit
+R1(config)# no access-list 50
+R1(config)# access-list 50 permit 192.168.10.0 0.0.0.255
+R1(config)# access-list 50 deny any
+R1(config)# line vty 0 4
+R1(config-line)# access-class 50 in
 ```
+
+**Защо `no access-list 50`?** Нов ред към съществуващ номериран ACL се добавя в края, след `deny any`, и няма ефект. Затова ACL-ът се създава наново в правилния ред.
 
 **Превенция:** ВИНАГИ тествай ACL преди да го прилагаш на VTY!
 
@@ -776,9 +836,9 @@ access-list 100 deny ip 192.168.20.0 0.0.0.255 any     ← Блокира ВСИ
 access-list 100 permit tcp 192.168.20.0 0.0.0.255 any eq 80  ← Никога не се достига
 ```
 
-**Решение:** Използвай Named ACL за пренареждане
+**Решение:** Редактирайте ACL-а по номерата на редовете (работи и за номериран ACL)
 ```cisco
-R1(config)# ip access-list extended MY_ACL
+R1(config)# ip access-list extended 100
 R1(config-ext-nacl)# no 10   ← Изтрий грешното правило
 R1(config-ext-nacl)# 5 permit tcp 192.168.20.0 0.0.0.255 any eq 80  ← Постави го ПРЕДИ deny
 ```
@@ -849,21 +909,23 @@ R1(config)# no ip access-list extended IT_TO_ADMIN
 
 ---
 
-## ЧАСТ 8: Port Security на Switch (BONUS) (10 мин)
+## ЧАСТ 8: Port Security на Switch (10 мин)
 
 ### Допълнителна сигурност на Layer 2
 
 Port Security **ограничава кои MAC адреси** могат да се свържат към порт.
 
 ```cisco
-SW1(config)# interface FastEthernet0/2
-SW1(config-if)# switchport mode access
-SW1(config-if)# switchport port-security
-SW1(config-if)# switchport port-security maximum 2
-SW1(config-if)# switchport port-security mac-address sticky
-SW1(config-if)# switchport port-security violation restrict
-SW1(config-if)# exit
+SW1(config)# interface range FastEthernet0/2 - 3
+SW1(config-if-range)# switchport mode access
+SW1(config-if-range)# switchport port-security
+SW1(config-if-range)# switchport port-security maximum 2
+SW1(config-if-range)# switchport port-security mac-address sticky
+SW1(config-if-range)# switchport port-security violation restrict
+SW1(config-if-range)# exit
 ```
+
+**Защо два порта?** Курсовият проект изисква Port Security на минимум 2 switch порта (тук Fa0/2 и Fa0/3 - PC1 и PC2).
 
 ### Violation modes:
 
@@ -879,6 +941,71 @@ SW1(config-if)# exit
 SW1# show port-security interface FastEthernet0/2
 SW1# show port-security address
 ```
+
+---
+
+## ЗАПИС НА ОСНОВНИЯ ФАЙЛ (за Lab 6)
+
+**Контролен тест:** от PC3 `nslookup server.company.local` работи (DNS е разрешен); PC3 → 192.168.10.2 ping работи; SSH от PC1 към R1 работи, а от PC3 към 192.168.20.1 е отказан.
+
+**Запазете файла като:** `Lab5_ACL_YourName.pkt` – това е началният файл за Lab 6.
+
+**Задачите по-долу изпълнявайте в отделен файл** (`Lab5_Extra_YourName.pkt`), защото променят ACL-ите.
+
+---
+
+## ЧАСТ 9 (BONUS): NAT към симулиран интернет (20 мин)
+
+Изпълнява се в отделния файл. Нужно е за курсовия проект само ако сценарият включва симулиран интернет.
+
+### Топология
+
+```
+[R1] Gi0/1 ──── Gi0/0 [ISP] Gi0/1 ──── [Internet Server]
+     203.0.113.2/30     203.0.113.1/30   198.51.100.1/24     198.51.100.10/24
+```
+
+- ISP: Router 2911; Internet Server: Server-PT (IP 198.51.100.10/24, Gateway 198.51.100.1)
+
+### Конфигурация на ISP
+
+```cisco
+ISP(config)# interface GigabitEthernet0/0
+ISP(config-if)# ip address 203.0.113.1 255.255.255.252
+ISP(config-if)# no shutdown
+ISP(config-if)# exit
+ISP(config)# interface GigabitEthernet0/1
+ISP(config-if)# ip address 198.51.100.1 255.255.255.0
+ISP(config-if)# no shutdown
+ISP(config-if)# exit
+```
+
+### PAT (NAT Overload) на R1
+
+```cisco
+R1(config)# interface GigabitEthernet0/1
+R1(config-if)# ip address 203.0.113.2 255.255.255.252
+R1(config-if)# ip nat outside
+R1(config-if)# no shutdown
+R1(config-if)# exit
+R1(config)# interface GigabitEthernet0/0.10
+R1(config-subif)# ip nat inside
+R1(config-subif)# exit
+R1(config)# interface GigabitEthernet0/0.20
+R1(config-subif)# ip nat inside
+R1(config-subif)# exit
+R1(config)# ip route 0.0.0.0 0.0.0.0 203.0.113.1
+R1(config)# access-list 1 permit 192.168.10.0 0.0.0.255
+R1(config)# access-list 1 permit 192.168.20.0 0.0.0.255
+R1(config)# ip nat inside source list 1 interface GigabitEthernet0/1 overload
+```
+
+### Тест
+
+- От PC1: `ping 198.51.100.10` → успешен
+- `R1# show ip nat translations` → вътрешният адрес на PC1 е преведен към 203.0.113.2
+
+Адресите 203.0.113.0/30 и 198.51.100.0/24 са запазени за документация и примери. Подробно NAT (Static, Dynamic, PAT) е в Lab 8.
 
 ---
 
@@ -929,9 +1056,9 @@ SW1# show port-security address
 
 | ACL | Тип | Име/Номер | Действие | Source | Destination | Service | Приложен на |
 |-----|-----|-----------|----------|--------|-------------|---------|-------------|
-| 1 | Standard | 10 | Deny | 192.168.10.12 | any | any | GigE0/0.10 out |
-| 2 | Extended | 100 | Permit | 192.168.20.0/24 | 192.168.10.0/24 | HTTP/HTTPS | GigE0/0.20 in |
-| 3 | Named | IT_TO_ADMIN | Permit | 192.168.20.0/24 | 192.168.10.0/24 | HTTP/HTTPS | GigE0/0.20 in |
+| 1 | Standard | 10 | Deny | 192.168.20.0/24 | VLAN 10 | any | GigE0/0.10 out |
+| 2 | Extended | 100 | Permit | 192.168.20.0/24 | 192.168.10.0/24 | HTTP/HTTPS, DNS, ICMP | GigE0/0.20 in |
+| 3 | Named | IT_TO_ADMIN | Permit | 192.168.20.0/24 | 192.168.10.0/24 | HTTP/HTTPS, DNS, ICMP | GigE0/0.20 in |
 | 4 | Standard | 50 | Permit | 192.168.10.0/24 | any | SSH | VTY 0-4 |
 
 ---
@@ -963,7 +1090,8 @@ SW1# show port-security address
 ☐ Разбирам implicit deny all
 ☐ ACL приложен в правилна посока
 ☐ SSH access control конфигуриран
-☐ Port security тестван (bonus)
+☐ SSH работи на R1, SW1 и SW2
+☐ Port Security на Fa0/2 и Fa0/3 конфигуриран и проверен
 ☐ Ping тестовете потвърждават permit правилата
 ☐ Ping тестовете потвърждават deny правилата
 ☐ ACL правилата документирани в таблица
@@ -993,7 +1121,7 @@ SW1# show port-security address
 ```cisco
 access-list 10 deny host 192.168.10.11
 access-list 10 permit any
-interface GigE0/0.20
+interface g0/0.20
  ip access-group 10 out
 ```
 
@@ -1002,7 +1130,7 @@ interface GigE0/0.20
 access-list 100 permit tcp 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255 eq 80
 access-list 100 deny ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
 access-list 100 permit ip any any
-interface GigE0/0.20
+interface g0/0.20
  ip access-group 100 in
 ```
 
@@ -1013,7 +1141,7 @@ ip access-list extended WEB_ACCESS
  permit tcp any any eq 80
  permit tcp any any eq 443
  deny ip any any
-interface GigE0/0.20
+interface g0/0.20
  ip access-group WEB_ACCESS in
 ```
 
@@ -1038,7 +1166,7 @@ interface Fa0/2
 ### Show Commands:
 ```cisco
 show access-lists                    ! Всички ACL-и
-show ip interface GigE0/0.20         ! ACL на интерфейс
+show ip interface g0/0.20            ! ACL на интерфейс
 show port-security interface Fa0/2   ! Port security статус
 show port-security address           ! Научени MAC адреси
 ```
@@ -1054,11 +1182,11 @@ show port-security address           ! Научени MAC адреси
 
 **Това е финалната стъпка преди курсовия проект!**
 
-**Запазете файла като:** `Lab5_ACL_YourName.pkt`
+**Запазете файла като:** `Lab5_ACL_YourName.pkt` (преди задачите; тях запазете отделно като `Lab5_Extra_YourName.pkt`)
 
 ---
 
-**Успех с лаба! ACL-ите са мощен инструмент за мрежова сигурност!**
+**Успех с упражнението! ACL-ите са мощен инструмент за мрежова сигурност!**
 
 
 

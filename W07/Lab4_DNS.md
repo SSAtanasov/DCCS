@@ -7,6 +7,8 @@
 
 **Предварителни изисквания:** Завършени Lab 1-3
 
+**Начален файл:** Отворете `Lab3_DHCP_YourName.pkt` (основния файл: R1 е единственият DHCP сървър, Fa0/11 и 192.168.10.2 са свободни) и го запазете като `Lab4_DNS_YourName.pkt`.
+
 ---
 
 ## ЧАСТ 1: Какво е DNS? (Теория - 10 мин)
@@ -105,6 +107,8 @@ DNS използва различни типове записи за разли�
 | **NS** | Name Server | DNS сървърът на домейна | `company.local` → `ns1.company.local` |
 | **PTR** | Pointer | IP → Име (обратно) | `192.168.10.3` → `web.company.local` |
 
+**Забележка:** Таблицата описва реален DNS. В Packet Tracer DNS сървърът поддържа записи **A, CNAME, SOA и NS**; AAAA, MX и PTR не могат да се създадат.
+
 ### Най-важните за нашия Lab:
 
 **A Record (Address):**
@@ -141,6 +145,8 @@ CNAME сочи към ДРУГО ИМЕ, което има A record.
 - 3600 секунди (1 час) - стандартно за нашия Lab
 - 86400 секунди (1 ден) - стабилни записи
 
+**Забележка:** В Packet Tracer TTL не се въвежда за всеки A или CNAME запис; задава се в SOA записа на зоната.
+
 ---
 
 ## ЧАСТ 2: Топология (5 мин)
@@ -161,16 +167,18 @@ CNAME сочи към ДРУГО ИМЕ, което има A record.
   [Server] [Server][PC1] [PC2] [PC3] [PC4] (празен)
   DNS(10.2) File   Admin Admin  IT    IT
            (10.50)
-           от Lab3
+           бонус Lab3
 ```
 
 **VLAN-и:**
 - VLAN 10: Administration (192.168.10.0/24)
 - VLAN 20: IT Department (192.168.20.0/24)
 
+**+ SW2 (Access):** свързан към SW1 Gi0/1 с trunk; PC5 (VLAN 10) и PC6 (VLAN 20) - от Lab 2, Част 3А.
+
 **Устройства:**
 - DNS Server (нов): 192.168.10.2
-- File Server (от Lab 3): 192.168.10.50
+- File Server (ако е изпълнен бонусът от Lab 3): 192.168.10.50
 - Web Server (в ЧАСТ 7): 192.168.10.3 (ще го добавим)
 
 ---
@@ -185,6 +193,7 @@ SW1(config)# interface FastEthernet0/11
 SW1(config-if)# switchport mode access
 SW1(config-if)# switchport access vlan 10
 SW1(config-if)# description DNS-Server
+SW1(config-if)# no shutdown
 SW1(config-if)# exit
 ```
 
@@ -223,32 +232,35 @@ DNS Server: 127.0.0.1  (посочва към себе си)
 
 **Добавете следните записи:**
 
-| Name | Type | Address | TTL |
-|------|------|---------|-----|
-| server.company.local | A | 192.168.10.2 | 3600 |
-| router.company.local | A | 192.168.10.1 | 3600 |
-| switch.company.local | A | 192.168.99.2 | 3600 |
-| web.company.local | A | 192.168.10.3 | 3600 |
-| pc1.company.local | A | 192.168.10.11 | 3600 |
-| pc2.company.local | A | 192.168.10.12 | 3600 |
+| Name | Type | Address |
+|------|------|---------|
+| server.company.local | A | 192.168.10.2 |
+| router.company.local | A | 192.168.10.1 |
+| switch.company.local | A | 192.168.99.2 |
+| web.company.local | A | 192.168.10.3 |
+| pc1.company.local | A | 192.168.10.11 |
+| pc2.company.local | A | 192.168.10.12 |
+
+**Забележка:** Адресите на PC1 и PC2 са получени от DHCP и могат да се различават. Проверете ги с `ipconfig` и въведете реалните. Тези записи не се обновяват автоматично при смяна на адреса.
 
 **Как се добавят:**
 1. Name: `server.company.local`
 2. Type: **A Record** (по подразбиране)
 3. Address: `192.168.10.2`
-4. TTL: `3600`
-5. Кликнете **Add**
-6. Повторете за всички
+4. Кликнете **Add**
+5. Повторете за всички
 
 ### Стъпка 4: Добавяне на CNAME records (Aliases)
 
 **CNAME Record** = Псевдоним → Друго име
 
-| Name | Type | Address | TTL |
-|------|------|---------|-----|
-| www.company.local | CNAME | web.company.local | 3600 |
-| mail.company.local | CNAME | server.company.local | 3600 |
-| dns.company.local | CNAME | server.company.local | 3600 |
+| Name | Type | Host Name |
+|------|------|-----------|
+| www.company.local | CNAME | web.company.local |
+| mail.company.local | CNAME | server.company.local |
+| dns.company.local | CNAME | server.company.local |
+
+**Забележка:** За CNAME записа Packet Tracer показва поле **Host Name** (каноничното име), а не Address.
 
 **Обяснение:**
 ```
@@ -277,6 +289,8 @@ R1(dhcp-config)# dns-server 192.168.10.2
 R1(dhcp-config)# domain-name company.local
 R1(dhcp-config)# exit
 ```
+
+**Ако в Lab 3 сте избрали Server DHCP (Метод 2):** горните команди не се изпълняват. Сменете DNS Server на 192.168.10.2 в pool-овете на DHCP сървъра (Services → DHCP).
 
 ### Release и Renew на PC-тата
 
@@ -399,10 +413,11 @@ SW1(config)# interface FastEthernet0/7
 SW1(config-if)# switchport mode access
 SW1(config-if)# switchport access vlan 10
 SW1(config-if)# description Web-Server
+SW1(config-if)# no shutdown
 SW1(config-if)# exit
 ```
 
-**Забележка:** Използваме Fa0/7 (Fa0/6 е зает от File Server в Lab 3).
+**Забележка:** Използваме Fa0/7 (Fa0/6 е зает от File Server, ако е изпълнен бонусът от Lab 3).
 
 ### Стъпка 2: Конфигурация на HTTP Service
 
@@ -556,8 +571,10 @@ ip dhcp pool ADMIN_POOL
 
 ### Задача 1: Добавете повече DNS записи
 Създайте записи за:
-- `printer.company.local` → 192.168.10.50
-- `camera.company.local` → 192.168.20.100
+- `printer.company.local` → 192.168.10.4
+- `camera.company.local` → 192.168.20.5
+
+(Адреси от резервирания диапазон .1–.10: 192.168.10.50 е File Server от Lab 3, а 192.168.20.100 е IoT Server в Lab 6.)
 
 ### Задача 2: Алтернативен домейн
 - Добавете записи за `internal.net`
@@ -565,6 +582,8 @@ ip dhcp pool ADMIN_POOL
 - Тествайте с ping
 
 ### Задача 3: Mail Server (MX Record - Advanced)
+
+**Само теоретично:** Packet Tracer не поддържа MX записи. Освен това MX трябва да сочи към име с A запис, а не към CNAME (в този лаб `mail.company.local` е CNAME).
 ```
 Type: MX
 Name: company.local
@@ -600,6 +619,14 @@ Priority: 10
 6. ✅ Интеграция с DHCP (dns-server option)
 7. ✅ nslookup команда за troubleshooting
 8. ✅ Web browser с DNS resolution
+
+---
+
+## КОНТРОЛЕН ТЕСТ ПРЕДИ LAB 5
+
+- `nslookup server.company.local` работи от PC1 **и** от PC3
+- `ipconfig /all` показва DNS Server 192.168.10.2
+- (ако има Web Server) `http://www.company.local` се отваря
 
 ---
 

@@ -3,9 +3,11 @@
 
 **Цел:** Да се научите да създавате VLAN-и, да ги назначавате на портове и да конфигурирате Router-on-a-Stick.
 
-**Продължителност:** 90-120 минути
+**Продължителност:** 120-150 минути (две учебни занятия)
 
 **Предварителни изисквания:** Завършен Lab 1
+
+**Начален файл:** Отворете `Lab1_YourName.pkt` (записан след добавянето на PC4) и веднага го запазете като `Lab2_VLANs_YourName.pkt`.
 
 ---
 
@@ -13,7 +15,7 @@
 
 ### Какво представлява VLAN?
 
-**VLAN (Virtual Local Area Network)** е **виртуална подмрежа** създадена на ниво switch, която **логически разделя** една физическа мрежа на няколко отделни broadcast домейна.
+**VLAN (Virtual Local Area Network)** е **виртуална локална мрежа**, създадена на ниво switch, която **логически разделя** една физическа мрежа на няколко отделни broadcast домейна.
 
 
 ### Преход от Lab 1: Защо НЕ използваме VLAN 1?
@@ -24,13 +26,13 @@
 │ Lab 1: VLAN 1 (default)                 │
 │ ❌ Всички в един VLAN                   │
 │ ❌ Няма изолация                        │
-│ ❌ Сигурност = 0                        │
+│ ❌ Няма сегментация между отделите      │
 └─────────────────────────────────────────┘
               ↓ ПРЕХОД
 ┌─────────────────────────────────────────┐
 │ Lab 2: VLAN 10, 20, 99                  │
 │ ✅ Логическо разделяне                  │
-│ ✅ Изолация между отдели                │
+│ ✅ Отделни broadcast домейни            │
 │ ✅ Management отделен (VLAN 99)         │
 └─────────────────────────────────────────┘
 ```
@@ -39,15 +41,14 @@
 
 | Риск | Обяснение |
 |------|-----------|
-| **Security vulnerability** | VLAN 1 не може да се изключи - винаги съществува |
-| **Management traffic exposure** | CDP, VTP, DTP, STP протоколи минават през VLAN 1 |
+| **Security vulnerability** | VLAN 1 не може да се изтрие - винаги съществува |
+| **Management traffic exposure** | Контролни протоколи на Cisco (CDP, VTP, DTP) използват VLAN 1 на trunk портовете |
 | **Default за всички портове** | Нови портове автоматично влизат в VLAN 1 |
 | **Best practice violation** | Cisco препоръчва VLAN 1 да не се използва за user data |
 
 **Оттук нататък (Lab 2-9) НИКОГА не използваме VLAN 1 за user трафик!**
 
 ---
-```
 
 ### Защо имаме нужда от VLAN-и?
 
@@ -81,11 +82,13 @@
 ├──────────────────────────────────────┤
 │  [===== СЪЩИЯ ФИЗИЧЕСКИ SWITCH =====] │
 │                                       │
-│  ✅ Изолация между отделите          │
+│  ✅ Отделни broadcast домейни        │
 │  ✅ По-малко broadcast трафик        │
 │  ✅ Сигурност чрез разделяне         │
 └──────────────────────────────────────┘
 ```
+
+**Важно:** VLAN-ите разделят устройствата в отделни broadcast домейни. Комуникацията между тях е възможна чрез Inter-VLAN routing (Част 4), а достъпът се ограничава с ACL (Lab 5).
 
 ### VLAN = "Виртуална подмрежа"?
 
@@ -106,13 +109,13 @@
 ### Защо VLAN-ите са полезни?
 
 1. **Сигурност:** 
-   - Финансовият отдел (VLAN 10) не може да вижда трафика на IT (VLAN 20)
+   - Административният отдел (VLAN 10) не може да вижда трафика на IT (VLAN 20)
    
 2. **Намаляване на broadcast трафик:**
    - Broadcast-ите в VLAN 10 НЕ достигат до VLAN 20
    
 3. **Гъвкавост:**
-   - Един служител може да смени отдел без да мени кабели
+   - Един служител може да смени отдел без да се сменят кабели
    
 4. **Икономия:**
    - Не трябват отделни switch-ове за всеки отдел
@@ -171,14 +174,14 @@ VLAN 30 → Router порт 3
 
 ### Access vs Trunk портове
 
-#### Access Port (достъпен порт):
+#### Access Port (порт за достъп):
 ```
 [PC] ───────► [Switch порт Fa0/2]
              (access VLAN 10)
 
 - Свързва КРАЙНО устройство (PC, принтер)
 - Принадлежи на ЕДИН VLAN
-- Трафикът НЕ е таgван (no 802.1Q tag)
+- Трафикът НЕ е тагван (no 802.1Q tag)
 ```
 
 #### Trunk Port (магистрален порт):
@@ -207,7 +210,7 @@ VLAN 30 → Router порт 3
 │          │         │ (VLAN ID)   │      │     │
 └──────────┴─────────┴─────────────┴──────┴─────┘
                       ↑
-                Contains VLAN 10, 20, or 99
+                Contains VLAN 10 or 20 (native VLAN 99 - no tag)
 ```
 
 **Пример:**
@@ -232,7 +235,7 @@ VLAN 99 traffic  ──► trunk ──► NO TAG (native) ❌
 
 1. **Backward compatibility** - за стари устройства без 802.1Q
 2. **Management traffic** - CDP, VTP, DTP протоколи
-3. **Fallback** - ако някой frame не може да се тагне
+3. **Untagged frames** - всеки нетагнат frame, получен на trunk, се причислява към native VLAN
 
 ### Важно правило:
 
@@ -264,8 +267,8 @@ Router GigE0/0: native VLAN 1 ❌
 
 ### Устройства:
 - 1x Router 2911 (R1)
-- 1x Switch 2960 (SW1)
-- 4x PC (PC1-Admin, PC2-Admin, PC3-IT, PC4-IT)
+- 2x Switch 2960 (SW1 - Distribution, SW2 - Access)
+- 6x PC (PC1-Admin, PC2-Admin, PC3-IT, PC4-IT, PC5-Admin, PC6-IT)
 
 ### Физическа свързаност:
 ```
@@ -282,29 +285,54 @@ Router GigE0/0: native VLAN 1 ❌
    VLAN 10 VLAN 10 VLAN 20 VLAN 20
 ```
 
+**+ SW2 (Access, Част 3А):** свързан към SW1 Gi0/1 с trunk; PC5 (VLAN 10) на Fa0/2 и PC6 (VLAN 20) на Fa0/3.
+
 ### VLAN дизайн:
 ```
 VLAN 10 - Administration (192.168.10.0/24)
   ├─ PC1-Admin: 192.168.10.10
   ├─ PC2-Admin: 192.168.10.11
+  ├─ PC5-Admin: 192.168.10.12 (на SW2)
   └─ Gateway: 192.168.10.1 (Router subinterface)
 
 VLAN 20 - IT Department (192.168.20.0/24)
   ├─ PC3-IT: 192.168.20.10
   ├─ PC4-IT: 192.168.20.11
+  ├─ PC6-IT: 192.168.20.12 (на SW2)
   └─ Gateway: 192.168.20.1 (Router subinterface)
 
 VLAN 99 - Management (192.168.99.0/24) [Native VLAN]
-  ├─ Switch: 192.168.99.2
+  ├─ SW1: 192.168.99.2
+  ├─ SW2: 192.168.99.3
   └─ Gateway: 192.168.99.1 (Router subinterface)
 ```
 **⚠️ Забележка:** Използваме VLAN 99 за management, НЕ VLAN 1!
-```
 
----
+### Адресен план и subnetting (основа за курсовия проект)
+
+Всяка VLAN е отделна IP подмрежа. Размерът на подмрежата се избира според броя на устройствата в нея:
+
+| Маска | Префикс | Използваеми хостове | Подходяща за |
+|-------|---------|---------------------|--------------|
+| 255.255.255.0 | /24 | 254 | голям отдел |
+| 255.255.255.128 | /25 | 126 | среден отдел |
+| 255.255.255.192 | /26 | 62 | малък отдел |
+| 255.255.255.224 | /27 | 30 | сървъри, малка група |
+| 255.255.255.240 | /28 | 14 | management |
+| 255.255.255.248 | /29 | 6 | няколко устройства |
+| 255.255.255.252 | /30 | 2 | връзка рутер-рутер |
+
+**Формула:** използваеми хостове = 2^(32 − префикс) − 2 (адресът на мрежата и broadcast адресът не се дават на устройства).
+
+**Пример:** 192.168.10.0/26 → мрежа 192.168.10.0, gateway 192.168.10.1, хостове .1–.62, broadcast 192.168.10.63. Следващата подмрежа започва от 192.168.10.64.
+
+В упражненията използваме /24 за простота. В курсовия проект изберете маски според броя на устройствата във всяка VLAN и ги документирайте в адресния план (мрежа, маска, gateway, DHCP диапазон, broadcast).
+
 ---
 
 ## ЧАСТ 2: Основна конфигурация (20 мин)
+
+**Забележка:** Ако продължавате от `Lab1_YourName.pkt`, hostname, паролите и `no ip domain-lookup` вече са зададени (prompt-ът е `R1>` и `SW1>`). Тогава прескочете тази част.
 
 ### Router базова настройка:
 ```cisco
@@ -340,10 +368,10 @@ SW1(config-line)# exit
 
 ### Стъпка 1: Създаване на VLAN-и
 
-```cisco
 **Важно:** Не създаваме VLAN 1 - той вече съществува по подразбиране.
 Ние създаваме нови VLAN-и (10, 20, 99) за правилна сегментация.
 
+```cisco
 SW1(config)# vlan 10
 SW1(config-vlan)# name Administration
 SW1(config-vlan)# exit
@@ -379,7 +407,8 @@ SW1# show vlan brief
 ```
 VLAN Name                             Status    Ports
 ---- -------------------------------- --------- -------------------------------
-1    default                          active    Fa0/1, Fa0/6-24, Gig0/1-2
+1    default                          active    Fa0/1, Fa0/2, Fa0/3, Fa0/4, Fa0/5
+                                                Fa0/6-24, Gig0/1-2
 10   Administration                   active    
 20   IT_Department                    active    
 99   Management                       active
@@ -467,6 +496,17 @@ Router:  native vlan 99  ✅  ← ТРЯБВА ДА СЪВПАДА!
 
 ---
 
+### Стъпка 4.1: Премахване на управлението от Lab 1 (VLAN 1)
+
+```cisco
+SW1(config)# interface vlan 1
+SW1(config-if)# no ip address
+SW1(config-if)# shutdown
+SW1(config-if)# exit
+```
+
+**Защо?** Управлението преминава във VLAN 99. Старият адрес 192.168.1.2 от Lab 1 не трябва да остане.
+
 ### Стъпка 5: Management VLAN адрес
 
 ```cisco
@@ -496,6 +536,118 @@ SW1(config)# exit
 ```cisco
 SW1# copy running-config startup-config
 ```
+
+---
+
+## ЧАСТ 3А: Втори комутатор и йерархия Access/Distribution (25 мин)
+
+### Защо втори комутатор?
+
+Курсовият проект изисква **минимум 2 комутатора** и **йерархична структура** (поне Access и Distribution слой):
+
+```
+         [R1]   ← Core: маршрутизиране между VLAN-ите
+          |
+        [SW1]   ← Distribution: събира trunk-овете, връзка към R1
+          |  trunk (Gi0/1 ↔ Gi0/1)
+        [SW2]   ← Access: крайни устройства
+        /    \
+    [PC5]    [PC6]
+   VLAN 10   VLAN 20
+```
+
+В малка мрежа R1 изпълнява ролята на Core, SW1 е Distribution, а SW2 е Access. В по-голяма мрежа всеки слой има отделни устройства.
+
+### Стъпка 1: Добавяне и свързване
+
+- Добавете Switch 2960 (SW2), PC5 и PC6
+- SW1 **Gi0/1** ←→ SW2 **Gi0/1** (кабел **Copper Cross-Over**)
+- SW2 Fa0/2 ←→ PC5, SW2 Fa0/3 ←→ PC6 (Copper Straight-Through)
+
+### Стъпка 2: Trunk на SW1 към SW2
+
+```cisco
+SW1(config)# interface GigabitEthernet0/1
+SW1(config-if)# description Trunk to SW2
+SW1(config-if)# switchport mode trunk
+SW1(config-if)# switchport trunk native vlan 99
+SW1(config-if)# switchport trunk allowed vlan 10,20,99
+SW1(config-if)# exit
+```
+
+### Стъпка 3: Конфигурация на SW2
+
+```cisco
+Switch> enable
+Switch# configure terminal
+Switch(config)# hostname SW2
+SW2(config)# no ip domain-lookup
+SW2(config)# enable secret class123
+SW2(config)# line console 0
+SW2(config-line)# password cisco
+SW2(config-line)# login
+SW2(config-line)# exit
+!
+SW2(config)# vlan 10
+SW2(config-vlan)# name Administration
+SW2(config-vlan)# exit
+SW2(config)# vlan 20
+SW2(config-vlan)# name IT_Department
+SW2(config-vlan)# exit
+SW2(config)# vlan 99
+SW2(config-vlan)# name Management
+SW2(config-vlan)# exit
+!
+SW2(config)# interface GigabitEthernet0/1
+SW2(config-if)# description Trunk to SW1
+SW2(config-if)# switchport mode trunk
+SW2(config-if)# switchport trunk native vlan 99
+SW2(config-if)# switchport trunk allowed vlan 10,20,99
+SW2(config-if)# exit
+!
+SW2(config)# interface FastEthernet0/2
+SW2(config-if)# switchport mode access
+SW2(config-if)# switchport access vlan 10
+SW2(config-if)# description PC5-Admin
+SW2(config-if)# exit
+SW2(config)# interface FastEthernet0/3
+SW2(config-if)# switchport mode access
+SW2(config-if)# switchport access vlan 20
+SW2(config-if)# description PC6-IT
+SW2(config-if)# exit
+!
+SW2(config)# interface vlan 99
+SW2(config-if)# ip address 192.168.99.3 255.255.255.0
+SW2(config-if)# no shutdown
+SW2(config-if)# exit
+SW2(config)# ip default-gateway 192.168.99.1
+SW2(config)# end
+SW2# copy running-config startup-config
+```
+
+**Важно:**
+- VLAN-ите се създават на **всеки** комутатор, през който минава трафикът им (VTP не се използва в тези упражнения)
+- Native VLAN и allowed списъкът трябва да **съвпадат** на двата края на trunk-а
+
+### Стъпка 4: IP адреси на PC5 и PC6
+
+```
+PC5 (VLAN 10): 192.168.10.12 / 255.255.255.0, Gateway 192.168.10.1
+PC6 (VLAN 20): 192.168.20.12 / 255.255.255.0, Gateway 192.168.20.1
+```
+
+### Стъпка 5: Проверка (след Част 4)
+
+```cisco
+SW2# show interfaces trunk      ← Gi0/1 trunking, native VLAN 99
+SW2# show vlan brief            ← Fa0/2 във VLAN 10, Fa0/3 във VLAN 20
+```
+
+- PC5 → PC1 (същата VLAN, през trunk-а SW2–SW1): успешен ping
+- PC5 → PC3 (друга VLAN, през R1): успешен ping
+- PC1 → 192.168.99.3 (управлението на SW2): успешен ping
+
+**Ако PC5 не достига gateway-я си:** проверете trunk-а на двата края (`show interfaces trunk`), дали VLAN 10 съществува на SW2 (`show vlan brief`) и дали е в allowed списъка.
 
 ---
 
@@ -539,6 +691,7 @@ PC1 иска да ping PC3:
 
 ```cisco
 R1(config)# interface GigabitEthernet0/0
+R1(config-if)# no ip address
 R1(config-if)# no shutdown
 R1(config-if)# description Trunk to SW1
 R1(config-if)# exit
@@ -546,6 +699,7 @@ R1(config-if)# exit
 
 **Обяснение:**
 - Физическият порт **НЕ получава IP адрес**
+- `no ip address` премахва адреса 192.168.1.1, останал от Lab 1
 - Трябва да е `no shutdown` за да работят subinterfaces-ите
 - Той е "контейнер" за виртуалните подинтерфейси
 
@@ -565,13 +719,13 @@ R1(config-subif)# exit
 
 | Команда | Какво прави | Детайли |
 |---------|-------------|---------|
-| `interface GigE0/0.10` | Създава **subinterface** с номер `.10` | Номерът може да е произволен, но за яснота използваме VLAN ID |
+| `interface GigabitEthernet0/0.10` | Създава **subinterface** с номер `.10` | Номерът може да е произволен, но за яснота използваме VLAN ID |
 | `encapsulation dot1Q 10` | Казва "този subinterface обработва **802.1Q tagged frames с VLAN ID = 10**" | Това е **КЛЮЧОВАТА** команда! Без нея router-ът не знае кои frames да насочи къде |
 | `ip address 192.168.10.1 ...` | IP адресът на subinterface (това е **gateway** за VLAN 10) | PC-тата в VLAN 10 ще използват този IP като default gateway |
 
 **Важно:** 
 - Командата `encapsulation dot1Q 10` казва:
-  - "Когато получиш frame с tag = 10, насочи го към ТОЗ subinterface"
+  - "Когато получиш frame с tag = 10, насочи го към ТОЗИ subinterface"
   - "Когато изпращаш frame ОТ този subinterface, добави tag = 10"
 
 ---
@@ -630,11 +784,11 @@ R1# show ip interface brief
 
 **Очакван резултат:**
 ```
-Interface              IP-Address      Status                Protocol
-GigabitEthernet0/0     unassigned      up                    up      
-GigE0/0.10             192.168.10.1    up                    up      
-GigE0/0.20             192.168.20.1    up                    up      
-GigE0/0.99             192.168.99.1    up                    up
+Interface              IP-Address      OK? Method Status                Protocol
+GigabitEthernet0/0     unassigned      YES unset  up                    up
+GigabitEthernet0/0.10  192.168.10.1    YES manual up                    up
+GigabitEthernet0/0.20  192.168.20.1    YES manual up                    up
+GigabitEthernet0/0.99  192.168.99.1    YES manual up                    up
 ```
 
 **Забележка:**
@@ -642,20 +796,28 @@ GigE0/0.99             192.168.99.1    up                    up
 - Трите subinterfaces имат IP адреси и са активни
 
 ```cisco
-R1# show vlan
+R1# show running-config
 ```
 
-**Очакван резултат:**
+**Търсете секциите на subinterfaces:**
 ```
-Virtual LAN ID:  10 (IEEE 802.1Q Encapsulation)
-   vLAN Trunk Interface:   GigabitEthernet0/0.10
-
-Virtual LAN ID:  20 (IEEE 802.1Q Encapsulation)
-   vLAN Trunk Interface:   GigabitEthernet0/0.20
-
-Virtual LAN ID:  99 (IEEE 802.1Q Encapsulation)
-   vLAN Trunk Interface:   GigabitEthernet0/0.99
+interface GigabitEthernet0/0.10
+ description Gateway for VLAN 10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+!
+interface GigabitEthernet0/0.20
+ description Gateway for VLAN 20
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+!
+interface GigabitEthernet0/0.99
+ description Gateway for Management VLAN
+ encapsulation dot1Q 99 native
+ ip address 192.168.99.1 255.255.255.0
 ```
+
+**Забележка:** Официалните упражнения на Cisco за Packet Tracer проверяват subinterfaces с `show ip interface brief` и `show running-config`; командата `show vlans` на рутера не е сред тях.
 
 ---
 
@@ -666,7 +828,7 @@ Virtual LAN ID:  99 (IEEE 802.1Q Encapsulation)
 IP Address: 192.168.10.10
 Subnet Mask: 255.255.255.0
 Default Gateway: 192.168.10.1   ← subinterface GigE0/0.10
-DNS Server: 192.168.10.1 (optional)
+DNS Server: (не се попълва; DNS сървър се добавя в Lab 4)
 ```
 
 ### PC2-Admin (VLAN 10):
@@ -767,13 +929,20 @@ R1# show ip route
 
 **Очакван резултат:**
 ```
-C    192.168.10.0/24 is directly connected, GigabitEthernet0/0.10
-C    192.168.20.0/24 is directly connected, GigabitEthernet0/0.20
-C    192.168.99.0/24 is directly connected, GigabitEthernet0/0.99
+     192.168.10.0/24 is variably subnetted, 2 subnets, 2 masks
+C       192.168.10.0/24 is directly connected, GigabitEthernet0/0.10
+L       192.168.10.1/32 is directly connected, GigabitEthernet0/0.10
+     192.168.20.0/24 is variably subnetted, 2 subnets, 2 masks
+C       192.168.20.0/24 is directly connected, GigabitEthernet0/0.20
+L       192.168.20.1/32 is directly connected, GigabitEthernet0/0.20
+     192.168.99.0/24 is variably subnetted, 2 subnets, 2 masks
+C       192.168.99.0/24 is directly connected, GigabitEthernet0/0.99
+L       192.168.99.1/32 is directly connected, GigabitEthernet0/0.99
 ```
 
 **Обяснение:**
 - `C` = **Connected route** (директно свързана мрежа)
+- `L` = **Local route** (адресът на самия subinterface, /32)
 - Router-ът "знае" за тези 3 мрежи защото има subinterfaces с IP адреси в тях
 
 ---
@@ -787,7 +956,7 @@ SW1# show vlan brief
 ```
 VLAN Name                             Status    Ports
 ---- -------------------------------- --------- -------------------------------
-1    default                          active    Fa0/6-24, Gig0/1-2
+1    default                          active    Fa0/6-24, Gig0/2
 10   Administration                   active    Fa0/2, Fa0/3
 20   IT_Department                    active    Fa0/4, Fa0/5
 99   Management                       active
@@ -801,9 +970,11 @@ SW1# show interfaces trunk
 ```
 Port        Mode         Encapsulation  Status        Native vlan
 Fa0/1       on           802.1q         trunking      99
+Gig0/1      on           802.1q         trunking      99
 
 Port        Vlans allowed on trunk
 Fa0/1       10,20,99
+Gig0/1      10,20,99
 ```
 
 ---
@@ -829,9 +1000,8 @@ tracert 192.168.20.10
 ### На Router:
 ```cisco
 R1# show ip interface brief        ← IP адреси и статус на интерфейси
-R1# show vlans                      ← VLAN-и на router subinterfaces
 R1# show ip route                   ← Routing таблица
-R1# show running-config             ← Пълна конфигурация
+R1# show running-config             ← Пълна конфигурация (вкл. encapsulation dot1Q)
 ```
 
 ### На Switch:
@@ -857,14 +1027,14 @@ SW1# show running-config            ← Пълна конфигурация
 | Причина | Проверка | Решение |
 |---------|----------|---------|
 | Router интерфейсът е shutdown | `R1# show ip int brief` | `R1(config-if)# no shutdown` |
-| Грешен encapsulation | `R1# show vlans` | Проверете дали VLAN ID съвпада |
+| Грешен encapsulation | `R1# show running-config` | Проверете дали VLAN ID съвпада |
 | Native VLAN не съвпада | `SW1# show int trunk` | Направете еднакви (напр. 99 и на двете) |
 | Trunk не е конфигуриран | `SW1# show int Fa0/1 switchport` | Конфигурирайте като trunk |
 
 **Debugging стъпки:**
 ```cisco
 R1# show ip interface brief   ← Всички ли subinterfaces са up/up?
-R1# show vlans                 ← Виждат ли се VLAN-ите?
+R1# show running-config        ← encapsulation dot1Q правилен ли е?
 SW1# show interfaces trunk    ← Trunk-ът active ли е?
 SW1# show vlan brief           ← Портовете назначени ли са към VLAN-и?
 ```
@@ -874,10 +1044,12 @@ SW1# show vlan brief           ← Портовете назначени ли с
 ### Проблем 2: Trunk не работи ❌
 
 **Симптоми:**
-- `show interfaces trunk` - no trunks found
 - Native VLAN mismatch warning
+- Trunk-ът е активен, но трафикът на VLAN 99 не преминава
 
 **Причина:** Native VLAN не съвпада
+
+**Забележка:** Ако `show interfaces trunk` не показва нищо, портът изобщо не е trunk (вижте Проблем 1, последния ред).
 
 **Решение:**
 ```cisco
@@ -886,7 +1058,7 @@ SW1(config)# interface FastEthernet0/1
 SW1(config-if)# switchport trunk native vlan 99
 
 ! На Router-а:
-R1(config)# interface GigE0/0.99
+R1(config)# interface g0/0.99
 R1(config-subif)# encapsulation dot1Q 99 native
 ```
 
@@ -918,7 +1090,7 @@ Trunking Native Mode VLAN: 99
 | Грешен default gateway | `ipconfig` | Променете на правилния (напр. 192.168.10.1) |
 | Грешна subnet mask | `ipconfig` | Трябва да е 255.255.255.0 |
 | Порт не е в правилния VLAN | `SW1# show vlan brief` | Назначете порта към правилния VLAN |
-| Cabeling issue | Visual inspection | Проверете дали кабелът е свързан |
+| Cabling issue | Visual inspection | Проверете дали кабелът е свързан |
 
 ---
 
@@ -987,6 +1159,16 @@ PC3 (192.168.20.10):
 
 ---
 
+## ЗАПИС НА ОСНОВНИЯ ФАЙЛ (за Lab 3)
+
+**Контролен тест:** PC1 → PC3 и PC5 → PC3 ping успешни; `show interfaces trunk` на SW2 показва Gi0/1; `show interfaces trunk` показва Fa0/1 с native VLAN 99; `show ip interface brief` на R1 показва .10, .20 и .99 up/up.
+
+**Запазете файла като:** `Lab2_VLANs_YourName.pkt` – това е началният файл за Lab 3.
+
+**Бонусът и задачите по-долу изпълнявайте в отделен файл** (`Lab2_Extra_YourName.pkt`): те използват Fa0/6 и VLAN 30 и изключват Fa0/7–24, а тези портове са нужни в Lab 3–6.
+
+---
+
 ## ДОПЪЛНИТЕЛНА КОНФИГУРАЦИЯ: Voice VLAN - BONUS
 
 ### Ако искате да добавите IP Phone (optional):
@@ -1006,6 +1188,7 @@ SW1(config-if)# exit
 - **PC** → VLAN 10 (untagged)
 - **IP Phone** → VLAN 100 (tagged)
 - Едно физическо свързване, но **два VLAN-а** едновременно!
+- За връзка извън switch-а VLAN 100 трябва да се добави към trunk-а (`switchport trunk allowed vlan add 100`) и да има subinterface на R1
 
 ---
 
@@ -1015,6 +1198,7 @@ SW1(config-if)# exit
 - Създайте VLAN 30 - Guest Network
 - Назначете порт Fa0/6 към този VLAN
 - Адресно пространство: 192.168.30.0/24
+- Добавете VLAN 30 към trunk-а (Fa0/1): `switchport trunk allowed vlan add 30`
 - Добавете subinterface на Router (GigE0/0.30)
 - Добавете PC и тествайте connectivity
 
@@ -1043,6 +1227,9 @@ SW1(config-if-range)# shutdown
 - Port assignments (кой порт в кой VLAN)
 - Device IPs (всички крайни устройства)
 
+### Задача 5: Адресен план с различни маски
+В 192.168.50.0/24 направете план за: VLAN A - 40 устройства, VLAN B - 25 устройства, VLAN C - 10 устройства, Management - 5 устройства. За всяка подмрежа определете маска, адрес на мрежата, gateway, DHCP диапазон и broadcast адрес. Подмрежите не трябва да се припокриват.
+
 ---
 
 ## CHECKLIST ЗА ЗАВЪРШВАНЕ
@@ -1050,6 +1237,8 @@ SW1(config-if-range)# shutdown
 ```
 ☐ Създадени са VLAN 10, 20, 99 на switch-а
 ☐ Портовете са правилно назначени към VLAN-ите (Fa0/2-5)
+☐ SW2 е свързан с trunk (Gi0/1 ↔ Gi0/1), VLAN-ите са създадени и на SW2
+☐ PC5 и PC6 (на SW2) достигат своите gateway-и
 ☐ Trunk е конфигуриран между SW1 Fa0/1 и R1 GigE0/0
 ☐ Native VLAN е 99 и на switch-а, и на router-а
 ☐ Subinterfaces на Router са активни (show ip int brief)
@@ -1065,7 +1254,7 @@ SW1(config-if-range)# shutdown
 
 ## КАКВО НАУЧИХМЕ
 
-1. ✅ **VLAN** е виртуална подмрежа (логическо разделяне на ниво switch)
+1. ✅ **VLAN** е виртуална локална мрежа (логически broadcast домейн на ниво switch)
 2. ✅ **Subinterface** е виртуален интерфейс върху физически порт на router
 3. ✅ **Access портове** свързват крайни устройства (един VLAN)
 4. ✅ **Trunk портове** носят трафик за множество VLAN-и (802.1Q tagging)
@@ -1084,7 +1273,7 @@ SW1(config-if-range)# shutdown
 - DHCP Relay Agent
 - IP Helper address
 
-**Запазете файла като:** `Lab2_VLANs_YourName.pkt`
+**Запазете файла като:** `Lab2_VLANs_YourName.pkt` (преди бонуса и задачите; тях запазете отделно като `Lab2_Extra_YourName.pkt`)
 
 ---
 
@@ -1117,23 +1306,23 @@ ip default-gateway 192.168.99.1
 ### Router:
 ```cisco
 ! Физически интерфейс
-interface GigE0/0
+interface g0/0
  no shutdown
 
 ! Subinterface
-interface GigE0/0.10
+interface g0/0.10
  encapsulation dot1Q 10
  ip address 192.168.10.1 255.255.255.0
 
 ! Native VLAN subinterface
-interface GigE0/0.99
+interface g0/0.99
  encapsulation dot1Q 99 native
  ip address 192.168.99.1 255.255.255.0
 ```
 
 ---
 
-**Успех с лаба (лабораторното упражнение)! **
+**Успех с упражнението!**
 
 
 <script data-goatcounter="https://satanasov.goatcounter.com/count"
