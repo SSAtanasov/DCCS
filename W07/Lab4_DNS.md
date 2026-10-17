@@ -290,6 +290,8 @@ R1(dhcp-config)# domain-name company.local
 R1(dhcp-config)# exit
 ```
 
+**Забележка:** Ако Packet Tracer не приеме `domain-name` в DHCP pool-а (`% Invalid input`), пропуснете реда. DNS работи и без него, защото в тестовете се използват пълните имена (напр. `server.company.local`).
+
 **Ако в Lab 3 сте избрали Server DHCP (Метод 2):** горните команди не се изпълняват. Сменете DNS Server на 192.168.10.2 в pool-овете на DHCP сървъра (Services → DHCP).
 
 ### Release и Renew на PC-тата

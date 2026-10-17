@@ -525,7 +525,7 @@ IP Address: 192.168.10.50
 2. ✅ DORA процес (Discover, Offer, Request, ACK)
 3. ✅ Конфигурация на DHCP на Router
 4. ✅ Excluded addresses
-5. ✅ (BONUS) Server като DHCP с lease time
+5. ✅ (BONUS) Server като DHCP (lease time – ако версията на PT има такова поле)
 6. ✅ (BONUS) Manual binding за сървъри
 7. ✅ Troubleshooting
 
