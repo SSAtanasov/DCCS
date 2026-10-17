@@ -54,12 +54,15 @@
 **IP адрес** е уникален идентификатор на устройство в мрежата.
 
 ```
-Формат: 192.168.1.1
-         │   │   │ │
-         │   │   │ └─ Host (устройство)
-         │   │   └─── Subnet (подмрежа)
-         │   └─────── Network (мрежа)
-         └─────────── Class (клас)
+IP адрес:        192.168.1.1
+Маска:           255.255.255.0 (/24)
+
+Мрежова част:    192.168.1   (определя се от маската)
+Хостова част:    .1
+
+Адрес на мрежа:  192.168.1.0
+Broadcast:       192.168.1.255
+Използваеми:     192.168.1.1 – 192.168.1.254
 ```
 
 **Subnet Mask:** Определя коя част е мрежа и коя е host
@@ -117,7 +120,7 @@ Switch FastEthernet0/4 ←→ PC3 FastEthernet0
 ```
 
 **Важно:** 
-- Router-Switch връзка: използвай GigE порт на router-а (по-бърз)
+- Router-Switch връзка: 2911 има само GigabitEthernet портове; към Fa0/1 на 2960 връзката работи на 100 Mbps (за 1 Gbps използвайте Gi0/1 на switch-а)
 - Switch-PC връзки: обикновени FastEthernet портове
 
 ---
@@ -190,7 +193,7 @@ R1(config-line)# exit
 | `configure terminal` | Влиза в **global configuration mode** | Позволява промени в конфигурацията | Prompt става `Router(config)#` |
 | `hostname R1` | Задава име на устройството | За идентификация (вместо "Router" вижда се "R1") | Prompt става `R1(config)#` |
 | `no ip domain-lookup` | Изключва автоматичното DNS търсене | Когато напишете грешна команда, не чака DNS отговор (по-бързо) | Без delay при грешки |
-| `enable secret class123` | Задава **шифрована** парола за privileged mode | Защита на устройството (enable = влизане в режим на администратор) | При `enable` ще пита за парола |
+| `enable secret class123` | Задава **хеширана** парола за privileged mode | Защита на устройството (enable = влизане в режим на администратор) | При `enable` ще пита за парола |
 | `line console 0` | Влиза в конфигурация на **конзолната линия** (физическото свързване) | За настройка на достъпа през конзолния порт | Prompt става `R1(config-line)#` |
 | `password cisco` | Задава парола за конзолен достъп | Защита при директен физически достъп | При влизане ще пита за "cisco" |
 | `login` | **Активира** проверката за парола | Без това, паролата няма да се изисква! | Ще изисква парола при login |
@@ -207,18 +210,19 @@ Router>                      ← User EXEC mode (ограничен)
 Router#                      ← Privileged EXEC mode (пълен достъп)
   ↓ configure terminal
 Router(config)#              ← Global Configuration mode
-  ↓ interface GigE0/0
+  ↓ interface g0/0
 Router(config-if)#           ← Interface Configuration mode
   ↓ exit
 Router(config)#              
   ↓ exit
 Router#
-  ↓ exit (or logout)
+  ↓ disable            (exit/logout тук прекратява сесията)
 Router>
 ```
 
 **Клавишни комбинации:**
-- `Ctrl+C` → Прекъсване на команда
+- `Ctrl+C` → Отказ от текущата команда
+- `Ctrl+Shift+6` → Прекъсване на ping/traceroute
 - `Ctrl+Z` → Директен изход към privileged mode
 - `exit` → Едно ниво назад
 - `end` → Директно към privileged mode
@@ -356,7 +360,7 @@ Switch работи на **Layer 2** (MAC адреси), но за **remote mana
 
 С IP адрес:
 - Switch работи ✅
-- Можеш SSH/Telnet към него ✅
+- SSH/Telnet: изискват допълнителна конфигурация (line vty, парола, login; за SSH и домейн, RSA ключове, потребител) ⚠️
 - Можеш да го ping-неш ✅
 ```
 
@@ -383,17 +387,17 @@ SW1(config)# ip default-gateway 192.168.1.1
 **Default gateway** е "изходът" към други мрежи.
 
 ```
-Сценарий: Трябва да update-неш switch-а от интернет
+Сценарий: Администратор от друга мрежа (10.0.0.5) управлява SW1
 
-SW1 (192.168.1.2) иска да достигне Update Server (8.8.8.8):
+SW1 (192.168.1.2) трябва да изпрати отговор към 10.0.0.5:
   ↓
-"8.8.8.8 не е в моята мрежа (192.168.1.0/24)"
+"10.0.0.5 не е в моята мрежа (192.168.1.0/24)"
   ↓
 "Изпращам към default gateway: 192.168.1.1"
   ↓
 Router (192.168.1.1) получава пакета
   ↓
-Router го изпраща към интернет
+Router го препраща, ако има маршрут към 10.0.0.0
 ```
 
 **Без default gateway:**
@@ -403,7 +407,8 @@ SW1 може да достъпи само устройства в 192.168.1.0/24
 
 **С default gateway:**
 ```
-SW1 може да достъпи всякъде (през router-а) ✅
+SW1 може да достигне мрежите, до които R1 има маршрут ✅
+(За интернет R1 се нуждае от външна връзка, маршрут по подразбиране и NAT.)
 ```
 
 ---
@@ -520,19 +525,17 @@ SW1# wr
 **Важно:**
 - **Subnet Mask** трябва да е еднаква за всички (255.255.255.0)
 - **Default Gateway** е винаги IP-то на Router-а (192.168.1.1)
-- **IP адресите** трябва да са уникални (няма два устройства с един IP)
+- **IP адресите** трябва да са уникални (няма две устройства с един и същ IP)
 
 ---
 
 ### Какво означават адресите?
 
 ```
-192.168.1.10
-│   │   │ │
-│   │   │ └─ Host част (устройство) - може да е от .1 до .254
-│   │   └─── Subnet (подмрежа) - всички са в .1
-│   └─────── Network (мрежа) - всички са в 168
-└─────────── Private Class C network
+IP адрес:        192.168.1.10 /24
+Мрежова част:    192.168.1   (обща за всички устройства)
+Хостова част:    .10         (уникална; допустими .1 – .254)
+Частен блок:     192.168.0.0/16 (RFC 1918)
 ```
 
 **Защо всички са 192.168.1.X?**
@@ -579,22 +582,22 @@ Ping statistics for 192.168.1.1:
 
 | Параметър | Значение | Какво означава |
 |-----------|----------|----------------|
-| **bytes=32** | Размер на пакета | Стандартен ICMP echo request |
+| **bytes=32** | Размер на данните | 32 байта полезен товар на ICMP (по подразбиране), не целият IP пакет |
 | **time<1ms** | Време за отговор | Много бързо (локална мрежа) |
-| **TTL=255** | Time To Live | Колко "скока" (hops) може да направи пакетът |
+| **TTL=255** | Time To Live | Оставащата стойност в получения отговор; всеки маршрутизатор по пътя я намалява с 1 |
 | **Lost = 0** | Загубени пакети | **0% = отлично!** |
 
 **Ако първият ping е "Request timed out":**
 ```
-Reply from 192.168.1.1: bytes=32 time<1ms TTL=255  ✅
-Reply from 192.168.1.1: bytes=32 time<1ms TTL=255  ✅
-Reply from 192.168.1.1: bytes=32 time<1ms TTL=255  ✅
 Request timed out.                                  ⚠️ Първият
+Reply from 192.168.1.1: bytes=32 time<1ms TTL=255  ✅
+Reply from 192.168.1.1: bytes=32 time<1ms TTL=255  ✅
+Reply from 192.168.1.1: bytes=32 time<1ms TTL=255  ✅
 
 Това е НОРМАЛНО! ✅
 ```
 
-**Защо?** ARP resolution (switch-ът трябва да "научи" MAC адреса)
+**Защо?** Изпращащото устройство изпълнява ARP, за да научи MAC адреса на 192.168.1.1; докато чака отговор, първата заявка може да изтече. Switch-ът не използва ARP: той научава MAC адресите от адреса на източника в получените кадри.
 
 ---
 
@@ -611,13 +614,13 @@ C:\> ping 192.168.1.12
 **Какво се случва при ping от PC1 → PC2:**
 
 ```
-1. PC1 изпраща ICMP Echo Request
+1. PC1 подготвя ICMP Echo Request
    └─ Destination IP: 192.168.1.11
    └─ Destination MAC: ? (не знае още)
 
 2. PC1 изпраща ARP Request (broadcast):
    "Кой има IP 192.168.1.11? Кажете ми MAC адреса!"
-   └─ Switch форвардва на всички портове
+   └─ Switch научава MAC на PC1 и препраща кадъра към всички портове във VLAN 1, освен входящия
 
 3. PC2 получава ARP Request:
    "Аз съм 192.168.1.11! Моят MAC е: AA:BB:CC:DD:EE:FF"
@@ -681,6 +684,8 @@ Internet  192.168.1.11           0    0044.4444.4444  ARPA   GigabitEthernet0/0
 Internet  192.168.1.12           0    0055.5555.5555  ARPA   GigabitEthernet0/0
 ```
 
+**Забележка:** Записи има само за устройства, с които R1 е комуникирал. След Test 1 и Test 3 ще видите 192.168.1.1 и 192.168.1.10; останалите се появяват след ping от/към тях.
+
 **Какво е ARP таблица?**
 
 **ARP (Address Resolution Protocol)** свързва **IP адреси** с **MAC адреси**.
@@ -723,7 +728,7 @@ GigabitEthernet0/1     unassigned      YES unset  administratively down down
 |--------|----------|--------|
 | **Interface** | Име на интерфейса | GigabitEthernet0/0 |
 | **IP-Address** | IP адрес (или unassigned) | 192.168.1.1 |
-| **OK?** | Конфигурацията валидна ли е | YES = добре |
+| **OK?** | Валиден ли е IP адресът | YES = адресът е валиден (не доказва, че интерфейсът работи) |
 | **Method** | Как е получен IP-ът | manual = ръчно конфигуриран |
 | **Status** | Физическо състояние (Layer 1) | **up** = кабел свързан ✅ |
 | **Protocol** | Логическо състояние (Layer 2) | **up** = протоколът работи ✅ |
@@ -752,9 +757,9 @@ R1# show running-config
 hostname R1                          ← Hostname
 !
 interface GigabitEthernet0/0         ← Интерфейс конфиг
- ip address 192.168.1.1 255.255.255.0
  description Connection to SW1
- no shutdown
+ ip address 192.168.1.1 255.255.255.0
+!                                    ← no shutdown не се извежда; изключен интерфейс показва shutdown
 !
 line console 0                       ← Конзола конфиг
  password cisco
@@ -773,13 +778,16 @@ R1# show ip route
 
 **Показва routing таблицата:**
 ```
-Codes: C - connected, S - static, R - RIP, M - mobile, B - BGP
+Codes: L - local, C - connected, S - static, R - RIP, M - mobile, B - BGP
 
-C    192.168.1.0/24 is directly connected, GigabitEthernet0/0
+     192.168.1.0/24 is variably subnetted, 2 subnets, 2 masks
+C       192.168.1.0/24 is directly connected, GigabitEthernet0/0
+L       192.168.1.1/32 is directly connected, GigabitEthernet0/0
 ```
 
 **Какво означава:**
 - `C` = **Connected route** (директно свързана мрежа)
+- `L` = **Local route** (собственият адрес на интерфейса, /32)
 - `192.168.1.0/24` = Мрежата
 - `GigabitEthernet0/0` = През кой интерфейс
 
@@ -801,7 +809,7 @@ FastEthernet0/1        unassigned      YES unset  up                    up
 FastEthernet0/2        unassigned      YES unset  up                    up
 ```
 
-**Забележка:** Switch портовете **НЕ** имат IP адреси (Layer 2 устройство)
+**Забележка:** Switch портовете **нямат** IP адреси (Layer 2 устройство)
 
 ---
 
@@ -886,7 +894,7 @@ Fa0/5                        notconnect   1          auto    auto  10/100BaseTX
 
 ---
 
-### Добавете още един PC
+### Задача 1: Добавете още един PC
 
 **Стъпки:**
 1. Добавете PC4 в топологията
@@ -908,7 +916,7 @@ Fa0/5                        notconnect   1          auto    auto  10/100BaseTX
 
 **Очакван резултат:** Всички ping-ове успешни ✅
 
-Запазете Packet Tracer файла си като: Lab1_YourName.pkt
+
 ---
 
 ## ДОПЪЛНИТЕЛНИ ЗАДАЧИ ЗА САМОСТОЯТЕЛНА РАБОТА
@@ -1005,15 +1013,16 @@ R1(config)# banner motd #Unauthorized access prohibited!#
    - Натиснете Enter
 
 3. **Трябва да видите:**
-   ```
-   ************************************************
-   *  Unauthorized access is strictly prohibited  *
-   *  All activities are logged                   *
-   ************************************************
-   
-   User Access Verification
-   Password:
-   ```
+
+```
+************************************************
+*  Unauthorized access is strictly prohibited  *
+*  All activities are logged                   *
+************************************************
+
+User Access Verification
+Password:
+```
 
 ---
 
@@ -1046,7 +1055,7 @@ $
 
 | Команда | Кога се показва |
 |---------|-----------------|
-| `banner motd` | **Message of the Day** - винаги при login |
+| `banner motd` | **Message of the Day** – при свързване, преди login банера и удостоверяването |
 | `banner login` | Преди login prompt |
 | `banner exec` | След успешен login |
 
@@ -1063,7 +1072,7 @@ $
    - Hostname: `SW2`
 
 2. **Свържете SW1 → SW2:**
-   - SW1 Fa0/24 ←→ SW2 Fa0/24
+   - SW1 Fa0/24 ←→ SW2 Fa0/24 (кабел **Copper Cross-Over**)
 
 3. **Конфигурирайте SW2:**
    ```cisco
@@ -1121,13 +1130,13 @@ Reply from 192.168.1.10: Destination host unreachable.
 | Router интерфейсът е shutdown | `R1# show ip int brief` | `R1(config-if)# no shutdown` |
 | Грешен subnet mask | `ipconfig` на PC | Поправете на 255.255.255.0 |
 | Грешен IP адрес | `ipconfig` на PC | Проверете че е в 192.168.1.X |
-| Няма default gateway | `ipconfig` на PC | Добавете 192.168.1.1 |
+| Прекъснат кабел или грешен порт | Цвят на връзката в Packet Tracer | Свържете кабела към правилния порт |
 
 ---
 
 ### Проблем 2: Червени триъгълници на връзките
 
-**Симптоми:** Връзките имат червени триъгълници вместо зелени точки
+**Симптоми:** Връзките имат червени триъгълници вместо зелени триъгълници
 
 **Причини:**
 - Интерфейсите не са активирани
@@ -1138,7 +1147,7 @@ Reply from 192.168.1.10: Destination host unreachable.
 1. **Изчакайте 30-60 секунди** (устройствата се инициализират)
 
 2. **Fast Forward Time:**
-   - Долен десен ъгъл → Play button
+   - Долна лента, вляво до часовника → бутон **Fast Forward Time** (>>)
    - Ускорява времето в симулацията
 
 3. **Проверете интерфейсите:**
@@ -1149,7 +1158,7 @@ Reply from 192.168.1.10: Destination host unreachable.
 
 4. **Ако са administratively down:**
    ```cisco
-   R1(config)# interface GigE0/0
+   R1(config)# interface g0/0
    R1(config-if)# no shutdown
    ```
 
@@ -1186,14 +1195,14 @@ Request timed out.
 | Причина | Проверка | Решение |
 |---------|----------|---------|
 | VLAN1 интерфейс е shutdown | `SW1# show ip int brief` | `SW1(config-if)# no shutdown` на interface vlan 1 |
-| Липсва default-gateway | `SW1# show running-config` | `SW1(config)# ip default-gateway 192.168.1.1` |
+| Няма активен порт във VLAN 1 (SVI остава down) | `SW1# show interfaces status` | Свържете устройство към порт във VLAN 1 |
 | Грешен IP адрес | `SW1# show ip int brief` | Поправете IP адреса |
 
 ---
 
 ### Проблем 5: Banner не се показва
 
-**Причина:** Грешна синтаксис или разделител
+**Причина:** Грешен синтаксис или разделител
 
 **Решение:**
 ```cisco
@@ -1293,7 +1302,7 @@ R1(config)# hsotname R1
    - VLAN 99 или 999 за management на switch-а
    
 ✅ Shutdown неизползваните портове:
-   interface range Fa0/10-24
+   interface range Fa0/10-23
      switchport access vlan 999
      shutdown
      
@@ -1307,7 +1316,7 @@ R1(config)# hsotname R1
 ## СЛЕДВАЩА СТЪПКА
 
 В **Lab 2** ще научим:
-- **VLAN-и** (виртуални подмрежи)
+- **VLAN-и** (виртуални локални мрежи)
 - **Inter-VLAN routing** (Router-on-a-Stick)
 - **Trunk портове** между switches
 - **802.1Q tagging**
@@ -1333,7 +1342,7 @@ line console 0                      ← Конзола конфиг
 
 ### Интерфейс конфигурация:
 ```cisco
-interface GigE0/0
+interface g0/0
   ip address 192.168.1.1 255.255.255.0
   description Connection to SW1
   no shutdown
