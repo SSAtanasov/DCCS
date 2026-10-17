@@ -560,6 +560,8 @@ SW1# copy running-config startup-config
 
 ### Стъпка 1: Добавяне и свързване
 
+**Проверка:** ако в началния файл вече има SW2 от Задача 4 на Lab 1 (връзка SW1 Fa0/24 ↔ SW2 Fa0/24), изтрийте този SW2 и PC-тата към него, преди да продължите.
+
 - Добавете Switch 2960 (SW2), PC5 и PC6
 - SW1 **Gi0/1** ←→ SW2 **Gi0/1** (кабел **Copper Cross-Over**)
 - SW2 Fa0/2 ←→ PC5, SW2 Fa0/3 ←→ PC6 (Copper Straight-Through)
