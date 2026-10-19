@@ -637,7 +637,7 @@ SW2# copy running-config startup-config
 PC5 (VLAN 10): 192.168.10.12 / 255.255.255.0, Gateway 192.168.10.1
 PC6 (VLAN 20): 192.168.20.12 / 255.255.255.0, Gateway 192.168.20.1
 ```
-
+<!--
 ### Стъпка 5: Проверка (след Част 4)
 
 ```cisco
@@ -650,6 +650,7 @@ SW2# show vlan brief            ← Fa0/2 във VLAN 10, Fa0/3 във VLAN 20
 - PC1 → 192.168.99.3 (управлението на SW2): успешен ping
 
 **Ако PC5 не достига gateway-я си:** проверете trunk-а на двата края (`show interfaces trunk`), дали VLAN 10 съществува на SW2 (`show vlan brief`) и дали е в allowed списъка.
+-->
 
 ---
 
